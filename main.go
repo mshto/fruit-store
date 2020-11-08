@@ -23,7 +23,7 @@ import (
 
 // TODO: add flags
 var (
-	configPath = "fruit_store_cfg.json"
+	configPath = "../fruit_store_cfg.json"
 )
 
 func main() {
