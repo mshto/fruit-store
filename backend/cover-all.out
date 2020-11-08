@@ -1,0 +1,14 @@
+mode: set
+github.com/mshto/fruit-store/backend/logger/logger.go:17.49,19.16 2 0
+github.com/mshto/fruit-store/backend/logger/logger.go:23.2,24.16 2 0
+github.com/mshto/fruit-store/backend/logger/logger.go:28.2,37.8 1 0
+github.com/mshto/fruit-store/backend/logger/logger.go:19.16,21.3 1 0
+github.com/mshto/fruit-store/backend/logger/logger.go:24.16,26.3 1 0
+github.com/mshto/fruit-store/backend/config/config.go:24.46,27.16 3 1
+github.com/mshto/fruit-store/backend/config/config.go:30.2,31.16 2 1
+github.com/mshto/fruit-store/backend/config/config.go:34.2,35.16 2 1
+github.com/mshto/fruit-store/backend/config/config.go:38.2,38.20 1 1
+github.com/mshto/fruit-store/backend/config/config.go:27.16,29.3 1 1
+github.com/mshto/fruit-store/backend/config/config.go:31.16,33.3 1 1
+github.com/mshto/fruit-store/backend/config/config.go:35.16,37.3 1 1
+github.com/mshto/fruit-store/backend/config/config.go:42.32,46.2 2 1
