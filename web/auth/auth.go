@@ -63,7 +63,8 @@ func (ah authHandler) Signup(w http.ResponseWriter, r *http.Request) {
 
 	creds.Password = string(hashedPassword)
 	err = ah.repo.Auth.Signup(creds)
-	if errors.Is(err, entity.ErrUserAlreadyExist) {
+	// if errors.Is(err, entity.ErrUserAlreadyExist) {
+	if err == entity.ErrUserAlreadyExist {
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
@@ -85,7 +86,8 @@ func (ah authHandler) Signin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	storedUser, err := ah.repo.Auth.GetUserByName(creds.Username)
-	if errors.Is(err, entity.ErrUserNotFound) {
+	// if errors.Is(err, entity.ErrUserNotFound) {
+	if err == entity.ErrUserNotFound {
 		response.RenderFailedResponse(w, http.StatusNotFound, err)
 		return
 	}
