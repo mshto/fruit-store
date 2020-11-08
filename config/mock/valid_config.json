@@ -1,0 +1,21 @@
+{
+    "ListenURL": ":80",
+    "URLPrefix": "/fruit-store",
+    "APIVersion": "v1",
+    "Logger": {
+        "Path": "fruit_store.log",
+        "LogLevel": "info"
+    },
+    "Database": {
+        "User": "postgres",
+        "Password": "secret",
+        "Host": "localhost",
+        "Port": 5432,
+        "DBName": "fruit_store"
+    },
+    "Redis": {
+        "Address": "localhost:6379",
+        "Password": "",
+        "DB": 0
+    }
+}
