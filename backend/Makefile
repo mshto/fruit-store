@@ -12,8 +12,12 @@ dependencies:
 test:
 	go test ./... -cover -coverprofile cover-all.out
 
-# Migration github repo: https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
+.PHONY: build
+build:
+	go build -o bin/go-getting-started -v .
+	# GOOS=linux GOARCH=amd64 go build -o fruit-store -v .
 
+# Migration github repo: https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
 migrate-new:
 	@migrate create -dir $(MIGRATIONS_DIR) -ext sql -format "unix" new_migration
 
