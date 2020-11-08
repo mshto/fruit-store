@@ -14,8 +14,8 @@
         "DBName": "d56t4fqipu28od"
     },
     "Redis": {
-        "Address": "localhost:6379",
-        "Password": "",
+        "Address": "ec2-54-204-89-145.compute-1.amazonaws.com:12989",
+        "Password": "pb7a1641811ef92cf8105147015b1fe03def354423e3d89cc8e8fb41b838affc2",
         "DB": 0
     }
 }
