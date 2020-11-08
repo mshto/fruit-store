@@ -1,5 +1,5 @@
 {
-    "ListenURL": ":80",
+    "ListenURL": ":5000",
     "URLPrefix": "/fruit-store",
     "APIVersion": "v1",
     "Logger": {
