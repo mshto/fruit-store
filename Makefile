@@ -14,8 +14,8 @@ test:
 
 .PHONY: build
 build:
-	go build -o bin/go-getting-started -v .
-	# GOOS=linux GOARCH=amd64 go build -o fruit-store -v .
+	# go build -o bin/go-getting-started -v .
+	GOOS=linux GOARCH=amd64 go build -o fruit-store -v .
 
 # Migration github repo: https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
 migrate-new:
@@ -29,16 +29,16 @@ migrate-down:
 migrate-force:
 	@migrate -path $(MIGRATIONS_DIR) -database $(MIGRATION_PATH) force 1604439163 
 
-GO_BUILD_ENV := CGO_ENABLED=0 GOOS=linux GOARCH=amd64
-DOCKER_BUILD=$(shell pwd)/.docker_build
-DOCKER_CMD=$(DOCKER_BUILD)/go-getting-started
+# GO_BUILD_ENV := CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+# DOCKER_BUILD=$(shell pwd)/.docker_build
+# DOCKER_CMD=$(DOCKER_BUILD)/go-getting-started
 
-$(DOCKER_CMD): clean
-	mkdir -p $(DOCKER_BUILD)
-	$(GO_BUILD_ENV) go build -v -o $(DOCKER_CMD) .
+# $(DOCKER_CMD): clean
+# 	mkdir -p $(DOCKER_BUILD)
+# 	$(GO_BUILD_ENV) go build -v -o $(DOCKER_CMD) .
 
-clean:
-	rm -rf $(DOCKER_BUILD)
+# clean:
+# 	rm -rf $(DOCKER_BUILD)
 
-heroku: $(DOCKER_CMD)
-	heroku container:push web
+# heroku: $(DOCKER_CMD)
+# 	heroku container:push web
