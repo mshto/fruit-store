@@ -61,8 +61,11 @@ func main() {
 	serverMiddleware.UseHandler(router)
 	// serverMiddleware.Use(middleware.NewTransaction())
 
+	port := os.Getenv("PORT")
+	listenURL := ":" + port
+	log.Infof("listenURL for requests on port: %s", listenURL)
 	server := &http.Server{
-		Addr:    config.ListenURL,
+		Addr:    listenURL,
 		Handler: serverMiddleware,
 	}
 
