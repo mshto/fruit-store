@@ -40,20 +40,31 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 	// 	// api.HandleFunc("/health", rest.HandlerHealth).Methods(http.MethodGet)
 
 	routerV1 := api.PathPrefix("/v1").Subrouter()
-	routerV1.HandleFunc("/signup", auh.Signup).Methods(http.MethodPost)
-	routerV1.HandleFunc("/signin", auh.Signin).Methods(http.MethodPost)
-	routerV1.HandleFunc("/refresh", auh.Refresh).Methods(http.MethodPost)
+	routerV1.HandleFunc("/signup", withCORS(auh.Signup)).Methods(http.MethodPost)
+	routerV1.HandleFunc("/signin", withCORS(auh.Signin)).Methods(http.MethodPost)
+	routerV1.HandleFunc("/refresh", withCORS(auh.Refresh)).Methods(http.MethodPost)
 
 	routerV1Auth := api.PathPrefix("/v1").Subrouter()
 	routerV1Auth.Use(middleware.AuthMiddleware(jwt))
 	// middlewares.ServeHTTP(appComponents.Log)
 	// routerV1.Use(middleware.AuthMiddleware)
-	routerV1Auth.HandleFunc("/logout", auh.Logout).Methods(http.MethodPost)
-	routerV1Auth.HandleFunc("/products", pdh.GetAll).Methods(http.MethodGet)
+	routerV1Auth.HandleFunc("/logout", withCORS(auh.Logout)).Methods(http.MethodPost)
+	routerV1Auth.HandleFunc("/products", withCORS(pdh.GetAll)).Methods(http.MethodGet)
 	// 	// routerV1.HandleFunc(integratorsDefinitions, ias.Create).Methods(http.MethodPost)
 	// 	// routerV1.HandleFunc(integratorsDefinitions+attributeID, ias.GetOne).Methods(http.MethodGet)
 	// 	// routerV1.HandleFunc(integratorsDefinitions+attributeID, ias.Update).Methods(http.MethodPut)
 	// 	// routerV1.HandleFunc(integratorsDefinitions+attributeID, ias.Delete).Methods(http.MethodDelete)
 
 	return router
+}
+
+// type appHandler func(http.ResponseWriter, *http.Request) error
+
+// Simple wrapper to Allow CORS.
+func withCORS(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		fn(w, r)
+	}
 }

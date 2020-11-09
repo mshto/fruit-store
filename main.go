@@ -92,7 +92,7 @@ func main() {
 // move to middleware
 func setWebServerMiddleware() *negroni.Negroni {
 	c := cors.New(cors.Options{
-		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete},
+		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions},
 		AllowedOrigins: []string{"*"},
 	})
 
