@@ -19,6 +19,7 @@ import (
 	"github.com/mshto/fruit-store/logger"
 	"github.com/mshto/fruit-store/repository"
 	"github.com/mshto/fruit-store/web"
+	"github.com/mshto/fruit-store/web/middleware"
 )
 
 // TODO: add flags
@@ -98,6 +99,7 @@ func setWebServerMiddleware() *negroni.Negroni {
 
 	middlewareManager := negroni.New()
 	middlewareManager.Use(negroni.NewRecovery())
+	middlewareManager.Use(middleware.NewWithCORSMiddleware())
 	middlewareManager.Use(c)
 
 	return middlewareManager
