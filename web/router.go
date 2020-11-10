@@ -39,6 +39,7 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 	routerV1Auth.HandleFunc("/products", pdh.GetAll).Methods(http.MethodGet)
 
 	routerV1Auth.HandleFunc("/cart/products", cth.GetAll).Methods(http.MethodGet)
+	routerV1Auth.HandleFunc("/cart/products", cth.UpdateProduct).Methods(http.MethodPost)
 
 	return router
 }

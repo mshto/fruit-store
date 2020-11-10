@@ -1,7 +1,6 @@
 CREATE TABLE users_cart (
-    id uuid DEFAULT uuid_generate_v1(),
+    product_id uuid REFERENCES products(id),
     user_id uuid REFERENCES users(id),
-    count int,
-    name character varying(255) NOT NULL,
-    PRIMARY KEY (id)
+    amount numeric,
+    CONSTRAINT product_user_pkey PRIMARY KEY (product_id, user_id)
 );

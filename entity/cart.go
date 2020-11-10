@@ -6,8 +6,22 @@ import (
 
 // UserProduct UserProduct
 type UserProduct struct {
-	ID    uuid.UUID `json:"id"`
-	Name  string    `json:"name"`
-	Count int       `json:"count"`
-	Price float32   `json:"price"`
+	UserID      uuid.UUID `json:"userId"`
+	ProductUUID uuid.UUID `json:"productId"`
+	Amount      int       `json:"amount"`
+	// ID          uuid.UUID `json:"id"`
+	// Name        string    `json:"name"`
+	// Count       int       `json:"count"`
+	// Price       float32   `json:"price"`
+}
+
+// GetUserProduct GetUserProduct
+type GetUserProduct struct {
+	Name   string  `json:"name"`
+	Price  float32 `json:"price"`
+	Amount int     `json:"amount"`
+	// ID          uuid.UUID `json:"id"`
+	// Name        string    `json:"name"`
+	// Count       int       `json:"count"`
+	// Price       float32   `json:"price"`
 }
