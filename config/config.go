@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"os"
 
 	"gopkg.in/go-playground/validator.v9"
 
@@ -37,6 +38,8 @@ func New(configPath string) (*Config, error) {
 	if err != nil {
 		return nil, fmt.Errorf("config validation failed: %w", err)
 	}
+
+	getEnvVariables(config)
 	return config, nil
 }
 
@@ -45,4 +48,11 @@ func validate(c *Config) error {
 	v := validator.New()
 
 	return v.Struct(c)
+}
+
+func getEnvVariables(c *Config) {
+	port := os.Getenv("PORT")
+	if port != "" {
+		c.ListenURL = ":" + port
+	}
 }

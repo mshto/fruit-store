@@ -25,6 +25,6 @@ func (s *WithCORSMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Request, n
 	if r.Method == "OPTIONS" {
 		return
 	}
-	// Lets Gorilla work
+
 	next(w, r)
 }

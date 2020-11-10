@@ -10,7 +10,6 @@ import (
 	"sync"
 	"syscall"
 
-	"github.com/rs/cors"
 	"github.com/urfave/negroni"
 
 	"github.com/mshto/fruit-store/cache"
@@ -22,7 +21,6 @@ import (
 	"github.com/mshto/fruit-store/web/middleware"
 )
 
-// TODO: add flags
 var (
 	configPath = "fruit_store_cfg.json"
 )
@@ -60,13 +58,9 @@ func main() {
 	router := web.New(config, log, repo, redis)
 	serverMiddleware := setWebServerMiddleware()
 	serverMiddleware.UseHandler(router)
-	// serverMiddleware.Use(middleware.NewTransaction())
 
-	port := os.Getenv("PORT")
-	listenURL := ":" + port
-	log.Infof("listenURL for requests on port: %s", listenURL)
 	server := &http.Server{
-		Addr:    listenURL,
+		Addr:    config.ListenURL,
 		Handler: serverMiddleware,
 	}
 
@@ -92,15 +86,9 @@ func main() {
 
 // move to middleware
 func setWebServerMiddleware() *negroni.Negroni {
-	c := cors.New(cors.Options{
-		AllowedMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete, http.MethodOptions},
-		AllowedOrigins: []string{"*"},
-	})
-
 	middlewareManager := negroni.New()
 	middlewareManager.Use(negroni.NewRecovery())
 	middlewareManager.Use(middleware.NewWithCORSMiddleware())
-	middlewareManager.Use(c)
 
 	return middlewareManager
 }
