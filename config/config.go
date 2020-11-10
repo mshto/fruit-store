@@ -21,6 +21,13 @@ type Config struct {
 	Logger     logger.Logger
 	Database   database.Database
 	Redis      cache.Redis
+	Auth       Auth
+}
+
+// Auth struct stores auth secret keys
+type Auth struct {
+	AccessSecret  string
+	RefreshSecret string
 }
 
 // New is reading json file, validating and returning config
@@ -54,5 +61,13 @@ func getEnvVariables(c *Config) {
 	port := os.Getenv("PORT")
 	if port != "" {
 		c.ListenURL = ":" + port
+	}
+	as := os.Getenv("ACCESS_SECRET")
+	if as != "" {
+		c.Auth.AccessSecret = as
+	}
+	rs := os.Getenv("REFRESH_SECRET")
+	if rs != "" {
+		c.Auth.RefreshSecret = rs
 	}
 }

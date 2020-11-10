@@ -3,8 +3,9 @@ package authentication
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
+
+	"github.com/mshto/fruit-store/config"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
@@ -31,35 +32,62 @@ type TokenDetails struct {
 
 // Auth Auth
 type Auth interface {
-	CreateTokens(userUUID uuid.UUID) (*entity.Tokens, error)
-	ValidateToken(token string) (*AccessDetails, error)
 	GetUserUUID(accessUUID string) (string, error)
+	CreateTokens(userUUID uuid.UUID) (*entity.Tokens, error)
 	RefreshTokens(refreshToken string) (*entity.Tokens, error)
+	ValidateToken(token string) (*AccessDetails, error)
 	RemoveTokens(accessUUID, userUUID string) error
-	// CreateAuth(userUUID uuid.UUID, td *entity.TokenDetails) error
-	// Signup(creds *entity.Credentials) error
-	// GetUserPasswordByName(userName string) (string, error)
 }
 
 // New New
-func New(cache *cache.Cache) Auth {
+func New(cfg config.Config, cache *cache.Cache) Auth {
 	return &authImpl{
+		cfg:   cfg,
 		cache: cache,
 	}
 }
 
 type authImpl struct {
 	cache *cache.Cache
+	cfg   config.Config
+}
+
+func (aui *authImpl) GetUserUUID(accessUUID string) (string, error) {
+	return aui.cache.Get(accessUUID)
+}
+
+func (aui *authImpl) CreateTokens(userUUID uuid.UUID) (*entity.Tokens, error) {
+	td := &TokenDetails{}
+	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
+	td.AccessUUID = uuid.New().String()
+
+	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
+	td.RefreshUUID = td.AccessUUID + "++" + userUUID.String()
+
+	err := aui.createAccessToken(userUUID, td)
+	if err != nil {
+		return nil, err
+	}
+
+	err = aui.createRefreshToken(userUUID, td)
+	if err != nil {
+		return nil, err
+	}
+
+	err = aui.createAuth(userUUID, td)
+
+	return &entity.Tokens{
+		AccessToken:  td.AccessToken,
+		RefreshToken: td.RefreshToken,
+	}, err
 }
 
 func (aui *authImpl) RefreshTokens(refreshToken string) (*entity.Tokens, error) {
-	os.Setenv("REFRESH_SECRET", "mcmvmkmsdnfsdmfdsjf") //this should be in an env file
 	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
-		//Make sure that the token method conform to "SigningMethodHMAC"
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("REFRESH_SECRET")), nil
+		return []byte(aui.cfg.Auth.RefreshSecret), nil
 	})
 	if err != nil {
 		return nil, err
@@ -91,48 +119,13 @@ func (aui *authImpl) RefreshTokens(refreshToken string) (*entity.Tokens, error) 
 	return aui.CreateTokens(userUUID)
 }
 
-func (aui *authImpl) CreateTokens(userUUID uuid.UUID) (*entity.Tokens, error) {
-	td := &TokenDetails{}
-	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
-	td.AccessUUID = uuid.New().String()
-
-	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	td.RefreshUUID = td.AccessUUID + "++" + userUUID.String()
-
-	err := aui.createAccessToken(userUUID, td)
-	if err != nil {
-		return nil, err
-	}
-
-	err = aui.createRefreshToken(userUUID, td)
-	if err != nil {
-		return nil, err
-	}
-
-	err = aui.createAuth(userUUID, td)
-
-	return &entity.Tokens{
-		AccessToken:  td.AccessToken,
-		RefreshToken: td.RefreshToken,
-	}, err
-}
-
-func (aui *authImpl) RemoveTokens(accessUUID, userUUID string) error {
-	err := aui.cache.Del(accessUUID)
-	if err != nil {
-		return err
-	}
-
-	err = aui.cache.Del(fmt.Sprintf("%s++%s", accessUUID, userUUID))
-	return err
-}
-
 func (aui *authImpl) ValidateToken(tokenString string) (*AccessDetails, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(os.Getenv("ACCESS_SECRET")), nil
+
+		return []byte(aui.cfg.Auth.AccessSecret), nil
 	})
 	if err != nil {
 		return nil, err
@@ -159,14 +152,19 @@ func (aui *authImpl) ValidateToken(tokenString string) (*AccessDetails, error) {
 	}, nil
 }
 
-func (aui *authImpl) GetUserUUID(accessUUID string) (string, error) {
-	return aui.cache.Get(accessUUID)
+func (aui *authImpl) RemoveTokens(accessUUID, userUUID string) error {
+	err := aui.cache.Del(accessUUID)
+	if err != nil {
+		return err
+	}
+
+	err = aui.cache.Del(fmt.Sprintf("%s++%s", accessUUID, userUUID))
+	return err
 }
 
 func (aui *authImpl) createAccessToken(userUUID uuid.UUID, td *TokenDetails) error {
 	var err error
 	//Creating Access Token
-	os.Setenv("ACCESS_SECRET", "jdnfksdmfksd") //this should be in an env file
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["access_uuid"] = td.AccessUUID
@@ -174,25 +172,25 @@ func (aui *authImpl) createAccessToken(userUUID uuid.UUID, td *TokenDetails) err
 	atClaims["exp"] = td.AtExpires
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 
-	td.AccessToken, err = at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
+	td.AccessToken, err = at.SignedString([]byte(aui.cfg.Auth.AccessSecret))
 	return err
 }
 
 func (aui *authImpl) createRefreshToken(userUUID uuid.UUID, td *TokenDetails) error {
 	var err error
-	//Creating Refresh Token
-	os.Setenv("REFRESH_SECRET", "mcmvmkmsdnfsdmfdsjf") //this should be in an env file
+
 	rtClaims := jwt.MapClaims{}
 	rtClaims["refresh_uuid"] = td.RefreshUUID
 	rtClaims["user_id"] = userUUID
 	rtClaims["exp"] = td.RtExpires
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	td.RefreshToken, err = rt.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
+
+	td.RefreshToken, err = rt.SignedString([]byte(aui.cfg.Auth.RefreshSecret))
 	return err
 }
 
 func (aui *authImpl) createAuth(userUUID uuid.UUID, td *TokenDetails) error {
-	at := time.Unix(td.AtExpires, 0) //converting Unix to UTC(to Time object)
+	at := time.Unix(td.AtExpires, 0)
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
