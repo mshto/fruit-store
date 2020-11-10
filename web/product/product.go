@@ -8,7 +8,6 @@ import (
 	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/repository"
 	"github.com/mshto/fruit-store/web/common/response"
-	"github.com/mshto/fruit-store/web/middleware"
 )
 
 // Service Partner Attribute Service
@@ -38,12 +37,10 @@ func NewProductHandler(cfg *config.Config, log *logrus.Logger, repo *repository.
 
 // GetAllProducts retrieves all products from db
 func (ph productHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-	userUUID := ctx.Value(middleware.UserUUID).(string)
-	ph.log.Error(userUUID)
 	products, err := ph.repo.Product.GetAll()
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
+		return
 	}
 
 	response.RenderResponse(w, http.StatusOK, products)

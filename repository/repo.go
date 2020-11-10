@@ -6,6 +6,7 @@ import "database/sql"
 func New(db *sql.DB) *Repository {
 	return &Repository{
 		Product: NewProduct(db),
+		Cart:    NewCartProduct(db),
 		Auth:    NewAuth(db),
 	}
 }
@@ -13,5 +14,6 @@ func New(db *sql.DB) *Repository {
 // Repository Repository
 type Repository struct {
 	Product Products
+	Cart    Cart
 	Auth    Auth
 }

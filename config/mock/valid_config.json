@@ -17,5 +17,9 @@
         "Address": "localhost:6379",
         "Password": "",
         "DB": 0
+    },
+    "Auth": {
+        "AccessSecret": "abc",
+        "RefreshSecret" : "abc"
     }
 }

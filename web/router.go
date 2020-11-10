@@ -11,6 +11,7 @@ import (
 	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/repository"
 	"github.com/mshto/fruit-store/web/auth"
+	"github.com/mshto/fruit-store/web/cart"
 	"github.com/mshto/fruit-store/web/middleware"
 	"github.com/mshto/fruit-store/web/product"
 )
@@ -20,6 +21,7 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 	jwt := authentication.New(cfg, redis)
 
 	pdh := product.NewProductHandler(cfg, log, repo)
+	cth := cart.NewCardHandler(cfg, log, repo)
 	auh := auth.NewAuthHandler(cfg, log, repo, jwt)
 
 	router := mux.NewRouter().StrictSlash(true)
@@ -35,6 +37,8 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 
 	routerV1Auth.HandleFunc("/logout", auh.Logout).Methods(http.MethodPost)
 	routerV1Auth.HandleFunc("/products", pdh.GetAll).Methods(http.MethodGet)
+
+	routerV1Auth.HandleFunc("/cart/products", cth.GetAll).Methods(http.MethodGet)
 
 	return router
 }
