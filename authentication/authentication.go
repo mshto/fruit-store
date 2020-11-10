@@ -40,7 +40,7 @@ type Auth interface {
 }
 
 // New New
-func New(cfg config.Config, cache *cache.Cache) Auth {
+func New(cfg *config.Config, cache *cache.Cache) Auth {
 	return &authImpl{
 		cfg:   cfg,
 		cache: cache,
@@ -49,7 +49,7 @@ func New(cfg config.Config, cache *cache.Cache) Auth {
 
 type authImpl struct {
 	cache *cache.Cache
-	cfg   config.Config
+	cfg   *config.Config
 }
 
 func (aui *authImpl) GetUserUUID(accessUUID string) (string, error) {

@@ -17,7 +17,7 @@ import (
 
 // New creates a router for URL-to-service mapping
 func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, redis *cache.Cache) *mux.Router {
-	jwt := authentication.New(redis)
+	jwt := authentication.New(cfg, redis)
 
 	pdh := product.NewProductHandler(cfg, log, repo)
 	auh := auth.NewAuthHandler(cfg, log, repo, jwt)
