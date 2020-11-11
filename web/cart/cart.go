@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 
 	"github.com/mshto/fruit-store/config"
@@ -99,14 +100,13 @@ func (ph cartHandler) AddOneProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prd := &entity.UserProduct{}
-	err = json.NewDecoder(r.Body).Decode(prd)
+	productUUID, err := uuid.Parse(mux.Vars(r)["productID"])
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
-	err = ph.repo.Cart.CreateUserProduct(userUUID, *prd)
+	err = ph.repo.Cart.CreateUserProduct(userUUID, productUUID)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
@@ -124,14 +124,13 @@ func (ph cartHandler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prd := &entity.UserProduct{}
-	err = json.NewDecoder(r.Body).Decode(prd)
+	productUUID, err := uuid.Parse(mux.Vars(r)["productID"])
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
-	err = ph.repo.Cart.RemoveUserProduct(userUUID, *prd)
+	err = ph.repo.Cart.RemoveUserProduct(userUUID, productUUID)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return

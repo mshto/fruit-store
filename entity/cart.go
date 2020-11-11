@@ -6,8 +6,8 @@ import (
 
 // UserProduct UserProduct
 type UserProduct struct {
+	ProductUUID uuid.UUID `json:"id"`
 	UserID      uuid.UUID `json:"userId"`
-	ProductUUID uuid.UUID `json:"productId"`
 	Amount      int       `json:"amount"`
 	// ID          uuid.UUID `json:"id"`
 	// Name        string    `json:"name"`
@@ -17,7 +17,7 @@ type UserProduct struct {
 
 // GetUserProduct GetUserProduct
 type GetUserProduct struct {
-	ProductUUID uuid.UUID `json:"productId"`
+	ProductUUID uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	Price       float32   `json:"price"`
 	Amount      int       `json:"amount"`
@@ -29,6 +29,6 @@ type GetUserProduct struct {
 
 // UserCart UserCart
 type UserCart struct {
-	CartProducts []GetUserProduct `json:"cart"`
+	CartProducts []GetUserProduct `json:"products"`
 	Total        string           `json:"total"`
 }

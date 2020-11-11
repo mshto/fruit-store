@@ -11,9 +11,9 @@ import (
 // Cart Cart
 type Cart interface {
 	GetUserProducts(userUUID uuid.UUID) ([]entity.GetUserProduct, error)
-	CreateUserProduct(userUUID uuid.UUID, prd entity.UserProduct) error
+	CreateUserProduct(userUUID, productUUID uuid.UUID) error
 	CreateUserProducts(userUUID uuid.UUID, prd entity.UserProduct) error
-	RemoveUserProduct(userUUID uuid.UUID, prd entity.UserProduct) error
+	RemoveUserProduct(userUUID, productUUID uuid.UUID) error
 }
 
 // NewCartProduct NewCartProduct
@@ -63,12 +63,12 @@ func (pri *productsImpl) CreateUserProducts(userUUID uuid.UUID, prd entity.UserP
 }
 
 // GetAll GetAll
-func (pri *productsImpl) CreateUserProduct(userUUID uuid.UUID, prd entity.UserProduct) error {
-	return pri.db.QueryRow(createUserProduct, userUUID, prd.ProductUUID, 1).Scan(&prd.UserID)
+func (pri *productsImpl) CreateUserProduct(userUUID, productUUID uuid.UUID) error {
+	return pri.db.QueryRow(createUserProduct, userUUID, productUUID, 1).Scan(&userUUID)
 }
 
 // GetAll GetAll
-func (pri *productsImpl) RemoveUserProduct(userUUID uuid.UUID, prd entity.UserProduct) error {
-	_, err := pri.db.Exec(deleteUserProduct, userUUID, prd.ProductUUID)
+func (pri *productsImpl) RemoveUserProduct(userUUID, productUUID uuid.UUID) error {
+	_, err := pri.db.Exec(deleteUserProduct, userUUID, productUUID)
 	return err
 }
