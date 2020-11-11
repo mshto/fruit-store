@@ -19,6 +19,7 @@ import (
 type Service interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
 	UpdateProduct(w http.ResponseWriter, r *http.Request)
+	AddOneProduct(w http.ResponseWriter, r *http.Request)
 	// Create(w http.ResponseWriter, r *http.Request)
 	// GetOne(w http.ResponseWriter, r *http.Request)
 	// Update(w http.ResponseWriter, r *http.Request)
@@ -57,8 +58,8 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 
 	total := entity.UserCart{
-		Carts: products,
-		Total: ph.calculateTotal(products),
+		CartProducts: products,
+		Total:        ph.calculateTotal(products),
 	}
 	response.RenderResponse(w, http.StatusOK, total)
 }
@@ -80,6 +81,31 @@ func (ph cartHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = ph.repo.Cart.CreateUserProducts(userUUID, *prd)
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
+}
+
+// GetAllProducts retrieves all products from db
+func (ph cartHandler) AddOneProduct(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	prd := &entity.UserProduct{}
+	err = json.NewDecoder(r.Body).Decode(prd)
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = ph.repo.Cart.CreateUserProduct(userUUID, *prd)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return

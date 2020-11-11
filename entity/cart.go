@@ -17,9 +17,10 @@ type UserProduct struct {
 
 // GetUserProduct GetUserProduct
 type GetUserProduct struct {
-	Name   string  `json:"name"`
-	Price  float32 `json:"price"`
-	Amount int     `json:"amount"`
+	ProductUUID uuid.UUID `json:"productId"`
+	Name        string    `json:"name"`
+	Price       float32   `json:"price"`
+	Amount      int       `json:"amount"`
 	// ID          uuid.UUID `json:"id"`
 	// Name        string    `json:"name"`
 	// Count       int       `json:"count"`
@@ -28,6 +29,6 @@ type GetUserProduct struct {
 
 // UserCart UserCart
 type UserCart struct {
-	Carts []GetUserProduct
-	Total string
+	CartProducts []GetUserProduct `json:"cart"`
+	Total        string           `json:"total"`
 }
