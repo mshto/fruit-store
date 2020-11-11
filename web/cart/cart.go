@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
 
+	"github.com/mshto/fruit-store/bill"
 	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/entity"
 	"github.com/mshto/fruit-store/repository"
@@ -33,14 +34,16 @@ type cartHandler struct {
 	cfg  *config.Config
 	log  *logrus.Logger
 	repo *repository.Repository
+	bil  bill.Bill
 }
 
 // NewCardHandler NewCardHandler
-func NewCardHandler(cfg *config.Config, log *logrus.Logger, repo *repository.Repository) Service {
+func NewCardHandler(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, bil bill.Bill) Service {
 	return cartHandler{
 		cfg:  cfg,
 		log:  log,
 		repo: repo,
+		bil:  bil,
 	}
 }
 
@@ -59,11 +62,17 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	total := entity.UserCart{
-		CartProducts: products,
-		Total:        ph.calculateTotal(products),
+	total, err := ph.bil.GetTotalInfo(products)
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
+		return
 	}
-	response.RenderResponse(w, http.StatusOK, total)
+
+	response.RenderResponse(w, http.StatusOK, entity.UserCart{
+		CartProducts: products,
+		Price:        total.Price,
+		Amount:       total.Amount,
+	})
 }
 
 // GetAllProducts retrieves all products from db
