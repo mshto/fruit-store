@@ -13,6 +13,7 @@ type Cart interface {
 	GetUserProducts(userUUID uuid.UUID) ([]entity.GetUserProduct, error)
 	CreateUserProduct(userUUID uuid.UUID, prd entity.UserProduct) error
 	CreateUserProducts(userUUID uuid.UUID, prd entity.UserProduct) error
+	RemoveUserProduct(userUUID uuid.UUID, prd entity.UserProduct) error
 }
 
 // NewCartProduct NewCartProduct
@@ -31,6 +32,7 @@ var (
 	getUserProducts    = `SELECT users_cart.amount, products.id, products.name, products.price FROM users_cart LEFT JOIN products ON users_cart.product_id=products.id AND users_cart.user_id=$1;`
 	createUserProducts = `INSERT INTO users_cart (user_id, product_id, amount) VALUES ($1, $2, $3) ON CONFLICT (product_id, user_id) DO UPDATE SET amount=$3 RETURNING user_id`
 	createUserProduct  = `INSERT INTO users_cart (user_id, product_id, amount) VALUES ($1, $2, $3) ON CONFLICT (product_id, user_id) DO UPDATE SET amount=users_cart.amount+1 RETURNING user_id`
+	deleteUserProduct  = `DELETE FROM users_cart WHERE user_id = $1 AND product_id = $2`
 )
 
 // GetAll GetAll
@@ -63,4 +65,10 @@ func (pri *productsImpl) CreateUserProducts(userUUID uuid.UUID, prd entity.UserP
 // GetAll GetAll
 func (pri *productsImpl) CreateUserProduct(userUUID uuid.UUID, prd entity.UserProduct) error {
 	return pri.db.QueryRow(createUserProduct, userUUID, prd.ProductUUID, 1).Scan(&prd.UserID)
+}
+
+// GetAll GetAll
+func (pri *productsImpl) RemoveUserProduct(userUUID uuid.UUID, prd entity.UserProduct) error {
+	_, err := pri.db.Exec(deleteUserProduct, userUUID, prd.ProductUUID)
+	return err
 }

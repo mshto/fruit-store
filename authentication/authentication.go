@@ -59,7 +59,7 @@ func (aui *authImpl) GetUserUUID(accessUUID string) (string, error) {
 func (aui *authImpl) CreateTokens(userUUID uuid.UUID) (*entity.Tokens, error) {
 	td := &TokenDetails{}
 	// TODOL update to 15
-	td.AtExpires = time.Now().Add(time.Minute * 2).Unix()
+	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
 	td.AccessUUID = uuid.New().String()
 
 	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()

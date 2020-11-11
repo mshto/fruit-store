@@ -20,6 +20,7 @@ type Service interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
 	UpdateProduct(w http.ResponseWriter, r *http.Request)
 	AddOneProduct(w http.ResponseWriter, r *http.Request)
+	RemoveProduct(w http.ResponseWriter, r *http.Request)
 	// Create(w http.ResponseWriter, r *http.Request)
 	// GetOne(w http.ResponseWriter, r *http.Request)
 	// Update(w http.ResponseWriter, r *http.Request)
@@ -112,6 +113,31 @@ func (ph cartHandler) AddOneProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
+}
+
+// GetAllProducts retrieves all products from db
+func (ph cartHandler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	prd := &entity.UserProduct{}
+	err = json.NewDecoder(r.Body).Decode(prd)
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = ph.repo.Cart.RemoveUserProduct(userUUID, *prd)
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.RenderResponse(w, http.StatusNoContent, response.EmptyResp{})
 }
 
 func (ph cartHandler) calculateTotal(products []entity.GetUserProduct) string {
