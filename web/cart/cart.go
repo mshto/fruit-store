@@ -2,6 +2,7 @@ package cart
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -55,7 +56,11 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.RenderResponse(w, http.StatusOK, products)
+	total := entity.UserCart{
+		Carts: products,
+		Total: ph.calculateTotal(products),
+	}
+	response.RenderResponse(w, http.StatusOK, total)
 }
 
 // GetAllProducts retrieves all products from db
@@ -81,4 +86,13 @@ func (ph cartHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
+}
+
+func (ph cartHandler) calculateTotal(products []entity.GetUserProduct) string {
+	var total float32
+	for _, prd := range products {
+		total += float32(prd.Amount) * prd.Price
+	}
+
+	return fmt.Sprintf("%.2f", total)
 }

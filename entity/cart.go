@@ -25,3 +25,9 @@ type GetUserProduct struct {
 	// Count       int       `json:"count"`
 	// Price       float32   `json:"price"`
 }
+
+// UserCart UserCart
+type UserCart struct {
+	Carts []GetUserProduct
+	Total string
+}

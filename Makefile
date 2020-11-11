@@ -28,7 +28,7 @@ migrate-up:
 migrate-down:
 	@migrate -path $(MIGRATIONS_DIR) -database $(MIGRATION_PATH) down
 migrate-force:
-	@migrate -path $(MIGRATIONS_DIR) -database $(MIGRATION_PATH) force 1604439163 
+	@migrate -path $(MIGRATIONS_DIR) -database $(MIGRATION_PATH) force 1605037011 
 
 # GO_BUILD_ENV := CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 # DOCKER_BUILD=$(shell pwd)/.docker_build

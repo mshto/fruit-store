@@ -1,8 +1,5 @@
-
-
-
 {
-    "ListenURL": ":80",
+    "ListenURL": ":5000",
     "URLPrefix": "/fruit-store",
     "APIVersion": "v1",
     "Logger": {
@@ -10,15 +7,15 @@
         "LogLevel": "info"
     },
     "Database": {
-        "User": "postgres",
-        "Password": "secret",
-        "Host": "localhost",
+        "User": "tlizipypsyzdzk",
+        "Password": "722e33386708aa46f59834a0c627cfbbc5c28b30ec98f24c27cb13216c7b73aa",
+        "Host": "ec2-34-237-236-32.compute-1.amazonaws.com",
         "Port": 5432,
-        "DBName": "fruit_store"
+        "DBName": "d56t4fqipu28od"
     },
     "Redis": {
-        "Address": "localhost:6379",
-        "Password": "",
+        "Address": "ec2-54-204-89-145.compute-1.amazonaws.com:12989",
+        "Password": "pb7a1641811ef92cf8105147015b1fe03def354423e3d89cc8e8fb41b838affc2",
         "DB": 0
     },
     "Auth": {
