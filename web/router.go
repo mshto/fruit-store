@@ -20,7 +20,7 @@ import (
 // New creates a router for URL-to-service mapping
 func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, redis *cache.Cache) *mux.Router {
 	jwt := authentication.New(cfg, redis)
-	bil := bill.New(cfg)
+	bil := bill.New(cfg, redis)
 
 	pdh := product.NewProductHandler(cfg, log, repo)
 	cth := cart.NewCardHandler(cfg, log, repo, bil)
@@ -44,6 +44,8 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 	routerV1Auth.HandleFunc("/cart/products", cth.UpdateProduct).Methods(http.MethodPost)
 	routerV1Auth.HandleFunc("/cart/products/{productID}", cth.AddOneProduct).Methods(http.MethodPost)
 	routerV1Auth.HandleFunc("/cart/products/{productID}", cth.RemoveProduct).Methods(http.MethodDelete)
+
+	routerV1Auth.HandleFunc("/cart/discount", cth.AddDiscout).Methods(http.MethodPost)
 
 	return router
 }

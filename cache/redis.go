@@ -1,17 +1,24 @@
 package cache
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
 	"github.com/go-redis/redis"
 )
 
+// error
+var (
+	ErrNotFound = errors.New("not found")
+)
+
 // Redis Redis
 type Redis struct {
-	Address  string `validate:"required"`
-	Password string
-	DB       int
+	Address     string `json:"Address"      envconfig:"REDIS_ADDRESS"       validate:"required"`
+	Password    string `json:"Password"     envconfig:"REDIS_PASSWORD"`
+	DB          int    `json:"DB"           envconfig:"REDIS_DB"`
+	DiscountTTL int    `json:"DiscountTTL"  envconfig:"REDIS_DISCOUNT_TTL"`
 }
 
 // Cache cache implementation based on Redis
@@ -37,7 +44,13 @@ func New(cfg Redis) (*Cache, error) {
 
 // Get retrieves value from cache
 func (m *Cache) Get(key string) (string, error) {
-	return m.redis.Get(key).Result()
+	value, err := m.redis.Get(key).Result()
+
+	if err == redis.Nil {
+		return value, ErrNotFound
+	}
+
+	return value, err
 	// value, err := m.Redis.Get(string(key))
 	// if err == goredis.Nil {
 	// 	return nil, cache.ErrNotFound
@@ -55,6 +68,7 @@ func (m *Cache) Get(key string) (string, error) {
 
 // Set stores value to cache
 func (m *Cache) Set(key string, value interface{}, exp time.Duration) error {
+	// value []byte
 	return m.redis.Set(key, value, exp).Err()
 }
 

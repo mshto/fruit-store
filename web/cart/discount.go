@@ -1,0 +1,56 @@
+package cart
+
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"net/http"
+
+	"github.com/google/uuid"
+	"github.com/mshto/fruit-store/cache"
+	"github.com/mshto/fruit-store/entity"
+	"github.com/mshto/fruit-store/web/common/response"
+	"github.com/mshto/fruit-store/web/middleware"
+)
+
+// GetAllProducts retrieves all products from db
+func (ph cartHandler) AddDiscout(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	dsc := &entity.Discount{}
+	err = json.NewDecoder(r.Body).Decode(dsc)
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusBadRequest, err)
+		return
+	}
+
+	sale, err := ph.bil.GetDiscountByUser(userUUID)
+	if err != nil && err != cache.ErrNotFound {
+		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
+		return
+	}
+	if sale.ID != "" {
+		response.RenderFailedResponse(w, http.StatusConflict, errors.New("discount is already added"))
+		return
+	}
+
+	dscRepo, err := ph.repo.Discount.GetDiscount(dsc.ID)
+	fmt.Println(dscRepo, err)
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	err = ph.bil.SetDiscount(userUUID, dscRepo)
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
+}

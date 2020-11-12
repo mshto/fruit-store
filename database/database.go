@@ -11,11 +11,11 @@ import (
 
 //Database struct stores system state database configuration
 type Database struct {
-	User     string `validate:"required"`
-	Password string `validate:"required"`
-	Host     string `validate:"required"`
-	Port     int    `validate:"required"`
-	DBName   string `validate:"required"`
+	User     string `json:"User"      envconfig:"DB_USER"     validate:"required"`
+	Password string `json:"Password"  envconfig:"DB_PASSWORD" validate:"required"`
+	Host     string `json:"Host"      envconfig:"DB_HOST"     validate:"required"`
+	Port     int    `json:"Port"      envconfig:"DB_PORT"     validate:"required"`
+	DBName   string `json:"DBName"    envconfig:"DB_NAME"     validate:"required"`
 }
 
 const (

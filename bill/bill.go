@@ -4,40 +4,21 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/mshto/fruit-store/cache"
+
+	"github.com/google/uuid"
+
 	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/entity"
 )
 
-// GeneralSale GeneralSale
-type GeneralSale struct {
-	Name     string
-	Elements map[string]int
-	Rules    string
-	Discount int
-}
-
-// Sales Sales
-var Sales = []GeneralSale{
-	GeneralSale{
-		Elements: map[string]int{
-			"Apples": 9,
-		},
-		Rules:    "more",
-		Discount: 10,
-	},
-	GeneralSale{
-		Elements: map[string]int{
-			"Pears":   4,
-			"Bananas": 2,
-		},
-		Rules:    "eq",
-		Discount: 30,
-	},
-}
-
 // Bill Bill
 type Bill interface {
-	GetTotalInfo(products []entity.GetUserProduct) (TotalInfo, error)
+	GetTotalInfo(userUUID uuid.UUID, products []entity.GetUserProduct) (TotalInfo, error)
+
+	GetDiscountByUser(userUUID uuid.UUID) (config.GeneralSale, error)
+	SetDiscount(userUUID uuid.UUID, sale config.GeneralSale) error
+	// GetDiscount(userUUID) (TotalInfo, error)
 }
 
 // Sale Sale
@@ -49,33 +30,49 @@ type Sale struct {
 
 // TotalInfo TotalInfo
 type TotalInfo struct {
-	Price  string
-	Amount string
+	Price   string
+	Savings string
+	Amount  string
 }
 
 // New New
-func New(cfg *config.Config) Bill {
+func New(cfg *config.Config, cache *cache.Cache) Bill {
 	return &billImpl{
-		cfg: cfg,
+		cfg:   cfg,
+		cache: cache,
 	}
 }
 
 type billImpl struct {
-	cfg *config.Config
+	cfg   *config.Config
+	cache *cache.Cache
 }
 
-func (bli *billImpl) GetTotalInfo(products []entity.GetUserProduct) (TotalInfo, error) {
+func (bli *billImpl) GetTotalInfo(userUUID uuid.UUID, products []entity.GetUserProduct) (TotalInfo, error) {
 	// var totalPrise float32
-
-	// get general sales / user sales
-	sales := Sales
-	prdMap := bli.convertListToMap(products)
+	var sales []config.GeneralSale
+	// get user sales
+	// GetDiscountByUser
+	userDiscount, err := bli.GetDiscountByUser(userUUID)
+	switch {
+	case err == cache.ErrNotFound:
+	case err != nil:
+		// log error here
+	default:
+		sales = append(sales, userDiscount)
+	}
+	sales = append(sales, bli.cfg.Sales...)
+	fmt.Println("mshto final", sales)
+	prdMap, priceWithoutSale := bli.getPriceWithoutSale(products)
 	salePrds, prd := bli.getProductsWithSale(sales, prdMap)
 
-	return bli.getTotalInfo(salePrds, prd), nil
+	totalInfo := bli.getTotalInfo(salePrds, prd, priceWithoutSale)
+	// totalInfo.PriceWithoutSale = priceWithoutSale
+	// fmt.Sprintf("%.2f", totalPrice)
+	return totalInfo, nil
 }
 
-func (bli *billImpl) getTotalInfo(salePrds []Result, products map[string]ProductMap) TotalInfo {
+func (bli *billImpl) getTotalInfo(salePrds []Result, products map[string]ProductMap, price float32) TotalInfo {
 	var totalPrice float32
 	var amount int
 	for _, salePrd := range salePrds {
@@ -88,8 +85,9 @@ func (bli *billImpl) getTotalInfo(salePrds []Result, products map[string]Product
 	}
 	fmt.Println(totalPrice)
 	return TotalInfo{
-		Price:  fmt.Sprintf("%.2f", totalPrice),
-		Amount: strconv.Itoa(amount),
+		Price:   fmt.Sprintf("%.2f", totalPrice),
+		Savings: fmt.Sprintf("%.2f", price-totalPrice),
+		Amount:  strconv.Itoa(amount),
 	}
 }
 
@@ -107,33 +105,32 @@ type ProductMap struct {
 	Amount int
 }
 
-func (bli *billImpl) convertListToMap(products []entity.GetUserProduct) map[string]ProductMap {
+func (bli *billImpl) getPriceWithoutSale(products []entity.GetUserProduct) (map[string]ProductMap, float32) {
+	var totalPrice float32
 	prdMap := map[string]ProductMap{}
 	for _, product := range products {
 		prdMap[product.Name] = ProductMap{
 			Price:  product.Price,
 			Amount: product.Amount,
 		}
+		totalPrice = totalPrice + product.Price*float32(product.Amount)
 	}
-	return prdMap
+	return prdMap, totalPrice
 }
 
-func (bli *billImpl) getProductsWithSale(sales []GeneralSale, products map[string]ProductMap) ([]Result, map[string]ProductMap) {
+func (bli *billImpl) getProductsWithSale(sales []config.GeneralSale, products map[string]ProductMap) ([]Result, map[string]ProductMap) {
 	results := []Result{}
-	for _, sale := range Sales {
-		fmt.Println("sale", sale.Elements)
+	for _, sale := range sales {
 		var count int
 		var isElementsMissed bool
 
 		for productK, productV := range sale.Elements {
 			product, ok := products[productK]
 			if !ok {
-				fmt.Println("productK", productK)
 				isElementsMissed = true
 				break
 			}
 			crtCount := product.Amount / productV
-			fmt.Println("crtCount", crtCount)
 			if crtCount < count || count == 0 {
 				count = crtCount
 			}
@@ -154,7 +151,7 @@ func (bli *billImpl) getProductsWithSale(sales []GeneralSale, products map[strin
 				Discount: sale.Discount,
 			}
 
-			switch sale.Rules {
+			switch sale.Rule {
 			case "more":
 				result.Amount = product.Amount
 				product.Amount = 0

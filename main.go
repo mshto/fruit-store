@@ -22,7 +22,8 @@ import (
 )
 
 var (
-	configPath = "fruit_store_cfg.json"
+	configPath      = "fruit_store_cfg.json"
+	salesConfigPath = "sales_cfg.json"
 )
 
 func main() {
@@ -33,7 +34,7 @@ func main() {
 		wg.Wait()
 	}()
 
-	config, err := config.New(configPath)
+	config, err := config.New(configPath, salesConfigPath)
 	if err != nil {
 		log.Fatal("failed to read config, error: %w", err)
 	}
@@ -42,12 +43,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to setup logger, error: %w", err)
 	}
-
+	log.Infof("config: %v", config)
 	db, err := database.New(config.Database)
 	if err != nil {
 		log.Fatalf("failed to setup db, error: %w", err)
 	}
-
+	log.Errorf("failed to setup db, error: %w", err)
 	redis, err := cache.New(config.Redis)
 	if err != nil {
 		log.Fatalf("failed to setup redis, error: %w", err)
@@ -60,7 +61,7 @@ func main() {
 	serverMiddleware.UseHandler(router)
 
 	server := &http.Server{
-		Addr:    config.ListenURL,
+		Addr:    fmt.Sprintf(":%s", config.ListenURL),
 		Handler: serverMiddleware,
 	}
 

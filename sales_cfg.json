@@ -1,0 +1,17 @@
+[
+        {
+            "Elements": {
+                "Apples": 9
+            },
+            "Rule": "more",
+            "Discount": 10
+        },
+        {
+            "Elements": {
+                "Pears": 4,
+                "Bananas": 2
+            },
+            "Rule": "eq",
+            "Discount": 30
+        }      
+]

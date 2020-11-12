@@ -30,6 +30,7 @@ type GetUserProduct struct {
 // UserCart UserCart
 type UserCart struct {
 	CartProducts []GetUserProduct `json:"products"`
-	Price        string           `json:"price"`
-	Amount       string           `json:"amount"`
+	TotalPrice   string           `json:"totalPrice"`
+	TotalSavings string           `json:"totalSavings"`
+	Amount       string           `json:"totalAmount"`
 }

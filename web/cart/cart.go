@@ -23,6 +23,8 @@ type Service interface {
 	UpdateProduct(w http.ResponseWriter, r *http.Request)
 	AddOneProduct(w http.ResponseWriter, r *http.Request)
 	RemoveProduct(w http.ResponseWriter, r *http.Request)
+
+	AddDiscout(w http.ResponseWriter, r *http.Request)
 	// Create(w http.ResponseWriter, r *http.Request)
 	// GetOne(w http.ResponseWriter, r *http.Request)
 	// Update(w http.ResponseWriter, r *http.Request)
@@ -62,7 +64,7 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	total, err := ph.bil.GetTotalInfo(products)
+	total, err := ph.bil.GetTotalInfo(userUUID, products)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
@@ -70,7 +72,8 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	response.RenderResponse(w, http.StatusOK, entity.UserCart{
 		CartProducts: products,
-		Price:        total.Price,
+		TotalPrice:   total.Price,
+		TotalSavings: total.Savings,
 		Amount:       total.Amount,
 	})
 }
