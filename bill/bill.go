@@ -134,9 +134,12 @@ func (bli *billImpl) getProductsWithSale(sales []config.GeneralSale, products ma
 				break
 			}
 			crtCount := product.Amount / productV
+			fmt.Println(productK)
+			fmt.Println(product.Amount, productV)
 			if crtCount < count || count == 0 {
 				count = crtCount
 			}
+			fmt.Println(count)
 		}
 
 		if count == 0 || isElementsMissed {
