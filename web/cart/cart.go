@@ -27,6 +27,8 @@ type Service interface {
 	RemoveProduct(w http.ResponseWriter, r *http.Request)
 
 	AddDiscout(w http.ResponseWriter, r *http.Request)
+
+	AddPayment(w http.ResponseWriter, r *http.Request)
 	// Create(w http.ResponseWriter, r *http.Request)
 	// GetOne(w http.ResponseWriter, r *http.Request)
 	// Update(w http.ResponseWriter, r *http.Request)

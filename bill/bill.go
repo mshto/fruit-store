@@ -19,7 +19,8 @@ type Bill interface {
 	GetDiscountByUser(userUUID uuid.UUID) (config.GeneralSale, error)
 	SetDiscount(userUUID uuid.UUID, sale config.GeneralSale) error
 
-	ValidateCard() error
+	ValidateCard(pmt entity.Payment) error
+	Pay(userUUID uuid.UUID) error
 	// GetDiscount(userUUID) (TotalInfo, error)
 }
 

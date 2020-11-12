@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/mshto/fruit-store/cache"
 	"github.com/mshto/fruit-store/config"
 )
 
@@ -32,23 +33,23 @@ func (bli *billImpl) GetDiscountByUser(userUUID uuid.UUID) (config.GeneralSale, 
 }
 
 func (bli *billImpl) SetDiscount(userUUID uuid.UUID, sale config.GeneralSale) error {
-	fmt.Println(fmt.Sprintf(pattertn, userUUID))
+
 	serialized, err := json.Marshal(sale)
 	if err != nil {
 		return err
 	}
 
 	return bli.cache.Set(fmt.Sprintf(pattertn, userUUID), serialized, time.Duration(bli.cfg.Redis.DiscountTTL)*time.Second)
-
 }
 
-// err = aui.cache.Del(fmt.Sprintf("%s++%s", accessUUID, userUUID))
+func (bli *billImpl) RemoveDiscount(userUUID uuid.UUID) error {
+	_, err := bli.GetDiscountByUser(userUUID)
+	switch {
+	case err == cache.ErrNotFound:
+		return nil
+	case err != nil:
+		return err
 
-// at := time.Unix(td.AtExpires, 0)
-// rt := time.Unix(td.RtExpires, 0)
-// now := time.Now()
-
-// err := aui.cache.Set(td.AccessUUID, userUUID.String(), at.Sub(now))
-// if err != nil {
-// 	return err
-// }
+	}
+	return bli.cache.Del(fmt.Sprintf(pattertn, userUUID))
+}

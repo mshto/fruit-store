@@ -47,5 +47,7 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 
 	routerV1Auth.HandleFunc("/cart/discount", cth.AddDiscout).Methods(http.MethodPost)
 
+	routerV1Auth.HandleFunc("/cart/payment", cth.AddPayment).Methods(http.MethodPost)
+
 	return router
 }
