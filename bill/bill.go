@@ -126,6 +126,7 @@ func (bli *billImpl) getProductsWithSale(sales []config.GeneralSale, products ma
 	for _, sale := range sales {
 		var count int
 		var isElementsMissed bool
+		var isCountUpdated bool
 
 		for productK, productV := range sale.Elements {
 			product, ok := products[productK]
@@ -136,7 +137,8 @@ func (bli *billImpl) getProductsWithSale(sales []config.GeneralSale, products ma
 			crtCount := product.Amount / productV
 			fmt.Println(productK)
 			fmt.Println(product.Amount, productV)
-			if crtCount < count || count == 0 {
+			if crtCount < count || count == 0 && !isCountUpdated {
+				isCountUpdated = true
 				count = crtCount
 			}
 			fmt.Println(count)
