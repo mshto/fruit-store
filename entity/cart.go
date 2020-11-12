@@ -29,8 +29,9 @@ type GetUserProduct struct {
 
 // UserCart UserCart
 type UserCart struct {
-	CartProducts []GetUserProduct `json:"products"`
-	TotalPrice   string           `json:"totalPrice"`
-	TotalSavings string           `json:"totalSavings"`
-	Amount       string           `json:"totalAmount"`
+	CartProducts    []GetUserProduct `json:"products"`
+	TotalPrice      string           `json:"totalPrice"`
+	TotalSavings    string           `json:"totalSavings"`
+	Amount          string           `json:"totalAmount"`
+	IsDiscountAdded bool             `json:"isDiscountAdded"`
 }

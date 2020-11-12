@@ -23,7 +23,7 @@ import (
 
 var (
 	configPath      = "fruit_store_cfg.json"
-	salesConfigPath = "sales_cfg.json"
+	salesConfigPath = "fruit_store_sales_cfg.json"
 )
 
 func main() {

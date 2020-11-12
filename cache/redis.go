@@ -51,19 +51,6 @@ func (m *Cache) Get(key string) (string, error) {
 	}
 
 	return value, err
-	// value, err := m.Redis.Get(string(key))
-	// if err == goredis.Nil {
-	// 	return nil, cache.ErrNotFound
-	// }
-
-	// if err != nil {
-	// 	return nil, errors.Wrap(cache.ErrInternal, err.Error())
-	// }
-
-	// serialized, ok := value.(string)
-	// if !ok {
-	// 	return nil, errors.New("cannot assert to string")
-	// }
 }
 
 // Set stores value to cache

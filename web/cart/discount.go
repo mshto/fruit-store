@@ -3,12 +3,12 @@ package cart
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/google/uuid"
 	"github.com/mshto/fruit-store/cache"
 	"github.com/mshto/fruit-store/entity"
+	"github.com/mshto/fruit-store/repository"
 	"github.com/mshto/fruit-store/web/common/response"
 	"github.com/mshto/fruit-store/web/middleware"
 )
@@ -40,7 +40,10 @@ func (ph cartHandler) AddDiscout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	dscRepo, err := ph.repo.Discount.GetDiscount(dsc.ID)
-	fmt.Println(dscRepo, err)
+	if err == repository.ErrNotFound {
+		response.RenderFailedResponse(w, http.StatusNotFound, err)
+		return
+	}
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return

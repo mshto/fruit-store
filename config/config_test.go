@@ -14,21 +14,31 @@ func TestConfigValidation(t *testing.T) {
 }
 
 func TestNewEmptyFile(t *testing.T) {
-	_, err := New("")
+	_, err := New("", "")
+	assert.Error(t, err, "expected error on empty path")
+}
+
+func TestNewSaleFile(t *testing.T) {
+	_, err := New("mock/valid_config.json", "")
 	assert.Error(t, err, "expected error on empty path")
 }
 
 func TestNewDefaultConfig(t *testing.T) {
-	_, err := New("mock/valid_config.json")
+	_, err := New("mock/valid_config.json", "mock/valid_sale_config.json")
 	assert.Nil(t, err)
 }
 
 func TestNewInvalidJsonConfig(t *testing.T) {
-	_, err := New("mock/invalid_config.json")
+	_, err := New("mock/invalid_config.json", "mock/valid_sale_config.json")
 	assert.NotNil(t, err)
 }
 
 func TestNewInvalidJsonValidationConfig(t *testing.T) {
-	_, err := New("mock/validation_err_config.json")
+	_, err := New("mock/validation_err_config.json", "mock/valid_sale_config.json")
+	assert.NotNil(t, err)
+}
+
+func TestNewInvalidSaleJsonConfig(t *testing.T) {
+	_, err := New("mock/valid_config.json", "mock/invalid_config.json")
 	assert.NotNil(t, err)
 }

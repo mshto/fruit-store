@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 
 	"github.com/kelseyhightower/envconfig"
@@ -50,10 +49,6 @@ func New(configPath string, salesCfg string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = validate(config)
-	if err != nil {
-		return nil, fmt.Errorf("config validation failed: %w", err)
-	}
 
 	salesContents, err := ioutil.ReadFile(salesCfg)
 	if err != nil {
@@ -65,8 +60,9 @@ func New(configPath string, salesCfg string) (*Config, error) {
 	}
 
 	readConfigFromENV(config)
-	// getEnvVariables(config)
-	return config, nil
+
+	err = validate(config)
+	return config, err
 }
 
 // validate validates a struct and nested fields
@@ -81,18 +77,3 @@ func readConfigFromENV(cfg *Config) error {
 	return envconfig.Process("", cfg)
 
 }
-
-// func getEnvVariables(c *Config) {
-// 	port := os.Getenv("PORT")
-// 	if port != "" {
-// 		c.ListenURL = ":" + port
-// 	}
-// 	as := os.Getenv("ACCESS_SECRET")
-// 	if as != "" {
-// 		c.Auth.AccessSecret = as
-// 	}
-// 	rs := os.Getenv("REFRESH_SECRET")
-// 	if rs != "" {
-// 		c.Auth.RefreshSecret = rs
-// 	}
-// }

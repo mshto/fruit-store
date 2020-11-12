@@ -11,6 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/mshto/fruit-store/bill"
+	"github.com/mshto/fruit-store/cache"
 	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/entity"
 	"github.com/mshto/fruit-store/repository"
@@ -75,11 +76,22 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var isDiscountAdded bool
+	sale, err := ph.bil.GetDiscountByUser(userUUID)
+	if err != nil && err != cache.ErrNotFound {
+		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
+		return
+	}
+	if sale.ID != "" {
+		isDiscountAdded = true
+	}
+
 	response.RenderResponse(w, http.StatusOK, entity.UserCart{
-		CartProducts: products,
-		TotalPrice:   total.Price,
-		TotalSavings: total.Savings,
-		Amount:       total.Amount,
+		CartProducts:    products,
+		TotalPrice:      total.Price,
+		TotalSavings:    total.Savings,
+		Amount:          total.Amount,
+		IsDiscountAdded: isDiscountAdded,
 	})
 }
 

@@ -18,6 +18,8 @@ type Bill interface {
 
 	GetDiscountByUser(userUUID uuid.UUID) (config.GeneralSale, error)
 	SetDiscount(userUUID uuid.UUID, sale config.GeneralSale) error
+
+	ValidateCard() error
 	// GetDiscount(userUUID) (TotalInfo, error)
 }
 

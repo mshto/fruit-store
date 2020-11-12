@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 
 	"github.com/mshto/fruit-store/config"
 )
@@ -25,14 +26,29 @@ type discountImpl struct {
 }
 
 var (
-	getDiscount    = `SELECT * FROM discount WHERE id=$1`
-	deleteDiscount = `DELETE FROM discount WHERE id=$1`
+	getDiscount      = `SELECT * FROM discount WHERE id=$1`
+	deleteDiscount   = `DELETE FROM discount WHERE id=$1`
+	validateDiscount = "SELECT exists (SELECT id FROM discount WHERE id=$1)"
+)
+
+// error
+var (
+	ErrNotFound = errors.New("not found")
 )
 
 func (dsi *discountImpl) GetDiscount(discountID string) (config.GeneralSale, error) {
 	sale := config.GeneralSale{}
 	var skills []byte
-	err := dsi.db.QueryRow(getDiscount, discountID).Scan(&sale.ID, &sale.Rule, &skills, &sale.Discount)
+
+	exists, err := dsi.isRowExist(discountID)
+	if err != nil {
+		return sale, err
+	}
+	if !exists {
+		return sale, ErrNotFound
+	}
+
+	err = dsi.db.QueryRow(getDiscount, discountID).Scan(&sale.ID, &sale.Rule, &skills, &sale.Discount)
 
 	// TODO: add a new struct to unmarshal json
 	err = json.Unmarshal(skills, &sale.Elements)
@@ -42,4 +58,10 @@ func (dsi *discountImpl) GetDiscount(discountID string) (config.GeneralSale, err
 func (dsi *discountImpl) RemoveDiscount(discountID string) error {
 	_, err := dsi.db.Exec(deleteDiscount, discountID)
 	return err
+}
+
+func (dsi *discountImpl) isRowExist(discountID string) (bool, error) {
+	var exists bool
+	err := dsi.db.QueryRow(validateDiscount, discountID).Scan(&exists)
+	return exists, err
 }

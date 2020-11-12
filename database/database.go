@@ -16,10 +16,10 @@ type Database struct {
 	Host     string `json:"Host"      envconfig:"DB_HOST"     validate:"required"`
 	Port     int    `json:"Port"      envconfig:"DB_PORT"     validate:"required"`
 	DBName   string `json:"DBName"    envconfig:"DB_NAME"     validate:"required"`
+	DBType   string `json:"DBType"    envconfig:"DB_TYPE"     validate:"required"`
 }
 
 const (
-	pssqlType      = "postgres"
 	pssqlDsnFormat = "host=%s port=%d user=%s password=%s dbname=%s sslmode=disable"
 
 	pingTimeoutSec = 5
@@ -28,7 +28,7 @@ const (
 // New New
 func New(db Database) (*sql.DB, error) {
 	psqlInfo := fmt.Sprintf(pssqlDsnFormat, db.Host, db.Port, db.User, db.Password, db.DBName)
-	conn, err := sql.Open(pssqlType, psqlInfo)
+	conn, err := sql.Open(db.DBType, psqlInfo)
 	if err != nil {
 		return nil, err
 	}

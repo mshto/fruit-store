@@ -10,13 +10,14 @@
         "Password": "secret",
         "Host": "localhost",
         "Port": 5432,
-        "DBName": "fruit_store"
+        "DBName": "fruit_store",
+        "DBType": "postgres"
     },
     "Redis": {
         "Address": "localhost:6379",
         "Password": "",
         "DB": 0,
-        "DiscountTTL": 120
+        "DiscountTTL": 20
     },
     "Auth": {
         "AccessSecret": "abc",
