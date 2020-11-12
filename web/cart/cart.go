@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -63,6 +64,10 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}
+
+	sort.Slice(products, func(i, j int) bool {
+		return products[i].Name < products[j].Name
+	})
 
 	total, err := ph.bil.GetTotalInfo(userUUID, products)
 	if err != nil {
