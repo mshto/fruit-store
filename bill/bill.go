@@ -75,10 +75,13 @@ func (bli *billImpl) GetTotalInfo(userUUID uuid.UUID, products []entity.GetUserP
 func (bli *billImpl) getTotalInfo(salePrds []Result, products map[string]ProductMap, price float32) TotalInfo {
 	var totalPrice float32
 	var amount int
+	fmt.Println("result sale", salePrds)
 	for _, salePrd := range salePrds {
 		totalPrice = totalPrice + (float32(salePrd.Amount) * salePrd.Price * ((100 - float32(salePrd.Discount)) / 100))
 		amount = amount + salePrd.Amount
 	}
+	fmt.Println("result price", totalPrice)
+	fmt.Println("result total", products)
 	for _, product := range products {
 		totalPrice = totalPrice + float32(product.Amount)*product.Price
 		amount = amount + product.Amount
