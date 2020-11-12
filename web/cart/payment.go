@@ -37,35 +37,18 @@ func (ph cartHandler) AddPayment(w http.ResponseWriter, r *http.Request) {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}
+
+	ph.bil.RemoveDiscount(userUUID)
+	if err != nil {
+		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
+		return
+	}
+
 	err = ph.bil.Pay(userUUID)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
-	// if err != nil && err != cache.ErrNotFound {
-	// 	response.RenderFailedResponse(w, http.StatusInternalServerError, err)
-	// 	return
-	// }
-	// if sale.ID != "" {
-	// 	response.RenderFailedResponse(w, http.StatusConflict, errors.New("discount is already added"))
-	// 	return
-	// }
 
-	// dscRepo, err := ph.repo.Discount.GetDiscount(dsc.ID)
-	// if err == repository.ErrNotFound {
-	// 	response.RenderFailedResponse(w, http.StatusNotFound, err)
-	// 	return
-	// }
-	// if err != nil {
-	// 	response.RenderFailedResponse(w, http.StatusInternalServerError, err)
-	// 	return
-	// }
-
-	// err = ph.bil.SetDiscount(userUUID, dscRepo)
-	// if err != nil {
-	// 	response.RenderFailedResponse(w, http.StatusInternalServerError, err)
-	// 	return
-	// }
-
-	// response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
+	response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
 }
