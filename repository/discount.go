@@ -26,7 +26,7 @@ type discountImpl struct {
 }
 
 var (
-	getDiscount      = `SELECT * FROM discount WHERE id=$1`
+	getDiscount      = `SELECT id, rule, elements, discount FROM discount WHERE id=$1`
 	deleteDiscount   = `DELETE FROM discount WHERE id=$1`
 	validateDiscount = "SELECT exists (SELECT id FROM discount WHERE id=$1)"
 )
@@ -49,7 +49,9 @@ func (dsi *discountImpl) GetDiscount(discountID string) (config.GeneralSale, err
 	}
 
 	err = dsi.db.QueryRow(getDiscount, discountID).Scan(&sale.ID, &sale.Rule, &skills, &sale.Discount)
-
+	if err != nil {
+		return sale, err
+	}
 	// TODO: add a new struct to unmarshal json
 	err = json.Unmarshal(skills, &sale.Elements)
 	return sale, err

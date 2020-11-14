@@ -1,6 +1,8 @@
 package repository
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 // New initializes new repo container for each table entity
 func New(db *sql.DB) *Repository {

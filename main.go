@@ -36,22 +36,22 @@ func main() {
 
 	config, err := config.New(configPath, salesConfigPath)
 	if err != nil {
-		log.Fatal("failed to read config, error: %w", err)
+		log.Fatalf("failed to read config, error: %v", err)
 	}
 
 	log, err := logger.New(config.Logger)
 	if err != nil {
-		log.Fatalf("failed to setup logger, error: %w", err)
+		log.Fatalf("failed to setup logger, error: %v", err)
 	}
 	log.Infof("config: %v", config)
 	db, err := database.New(config.Database)
 	if err != nil {
-		log.Fatalf("failed to setup db, error: %w", err)
+		log.Fatalf("failed to setup db, error: %v", err)
 	}
-	log.Errorf("failed to setup db, error: %w", err)
+
 	redis, err := cache.New(config.Redis)
 	if err != nil {
-		log.Fatalf("failed to setup redis, error: %w", err)
+		log.Fatalf("failed to setup redis, error: %v", err)
 	}
 
 	repo := repository.New(db)

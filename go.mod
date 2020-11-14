@@ -3,8 +3,10 @@ module github.com/mshto/fruit-store
 go 1.13
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
 	github.com/alicebob/miniredis v2.5.0+incompatible
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/durango/go-credit-card v0.0.0-20200501133251-afc6bc77117d
 	github.com/go-playground/universal-translator v0.17.0 // indirect

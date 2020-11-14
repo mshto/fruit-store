@@ -23,7 +23,7 @@ type productsImpl struct {
 }
 
 var (
-	getAllProducts = `SELECT * FROM products`
+	getAllProducts = `SELECT id, name, price, created_at FROM products`
 )
 
 // GetAll GetAll
