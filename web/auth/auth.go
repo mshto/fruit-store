@@ -55,6 +55,11 @@ func (ah authHandler) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if creds.Password != creds.PasswordRepeat {
+		response.RenderFailedResponse(w, http.StatusNotFound, errors.New("passwords aren't equal"))
+		return
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(creds.Password), 8)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
@@ -82,11 +87,6 @@ func (ah authHandler) Signin(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(creds)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
-		return
-	}
-
-	if creds.Password != creds.PasswordRepeat {
-		response.RenderFailedResponse(w, http.StatusNotFound, errors.New("passwords aren't equal"))
 		return
 	}
 
