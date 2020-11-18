@@ -4,30 +4,22 @@ import (
 	"github.com/google/uuid"
 )
 
-// UserProduct UserProduct
+// UserProduct struct
 type UserProduct struct {
 	ProductUUID uuid.UUID `json:"id"`
 	UserID      uuid.UUID `json:"userId"`
 	Amount      int       `json:"amount"`
-	// ID          uuid.UUID `json:"id"`
-	// Name        string    `json:"name"`
-	// Count       int       `json:"count"`
-	// Price       float32   `json:"price"`
 }
 
-// GetUserProduct GetUserProduct
+// GetUserProduct struct
 type GetUserProduct struct {
 	ProductUUID uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	Price       float32   `json:"price"`
 	Amount      int       `json:"amount"`
-	// ID          uuid.UUID `json:"id"`
-	// Name        string    `json:"name"`
-	// Count       int       `json:"count"`
-	// Price       float32   `json:"price"`
 }
 
-// UserCart UserCart
+// UserCart struct
 type UserCart struct {
 	CartProducts    []GetUserProduct `json:"products"`
 	TotalPrice      string           `json:"totalPrice"`

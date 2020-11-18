@@ -13,7 +13,7 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
-// Redis Redis
+// Redis info struct
 type Redis struct {
 	Address     string `json:"Address"      envconfig:"REDIS_ADDRESS"       validate:"required"`
 	Password    string `json:"Password"     envconfig:"REDIS_PASSWORD"`
@@ -26,7 +26,7 @@ type Cache struct {
 	redis *redis.Client
 }
 
-// New New
+// New init cache client
 func New(cfg Redis) (*Cache, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:     cfg.Address,
@@ -55,7 +55,6 @@ func (m *Cache) Get(key string) (string, error) {
 
 // Set stores value to cache
 func (m *Cache) Set(key string, value interface{}, exp time.Duration) error {
-	// value []byte
 	return m.redis.Set(key, value, exp).Err()
 }
 

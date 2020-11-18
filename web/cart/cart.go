@@ -2,7 +2,6 @@ package cart
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"sort"
 
@@ -19,7 +18,7 @@ import (
 	"github.com/mshto/fruit-store/web/middleware"
 )
 
-// Service Partner Attribute Service
+// Service Cart Service
 type Service interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
 	UpdateProduct(w http.ResponseWriter, r *http.Request)
@@ -29,13 +28,9 @@ type Service interface {
 	AddDiscout(w http.ResponseWriter, r *http.Request)
 
 	AddPayment(w http.ResponseWriter, r *http.Request)
-	// Create(w http.ResponseWriter, r *http.Request)
-	// GetOne(w http.ResponseWriter, r *http.Request)
-	// Update(w http.ResponseWriter, r *http.Request)
-	// Delete(w http.ResponseWriter, r *http.Request)
 }
 
-// ProductHandler ProductHandler
+// ProductHandler product handler struct
 type cartHandler struct {
 	cfg  *config.Config
 	log  *logrus.Logger
@@ -168,13 +163,4 @@ func (ph cartHandler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.RenderResponse(w, http.StatusNoContent, response.EmptyResp{})
-}
-
-func (ph cartHandler) calculateTotal(products []entity.GetUserProduct) string {
-	var total float32
-	for _, prd := range products {
-		total += float32(prd.Amount) * prd.Price
-	}
-
-	return fmt.Sprintf("%.2f", total)
 }

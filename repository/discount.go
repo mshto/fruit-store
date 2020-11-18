@@ -8,13 +8,13 @@ import (
 	"github.com/mshto/fruit-store/config"
 )
 
-// Discount Discount
+// Discount interface
 type Discount interface {
 	GetDiscount(discountID string) (config.GeneralSale, error)
 	RemoveDiscount(discountID string) error
 }
 
-// NewDiscount NewDiscount
+// NewDiscount generate new discount
 func NewDiscount(db *sql.DB) Discount {
 	return &discountImpl{
 		db: db,
@@ -36,6 +36,7 @@ var (
 	ErrNotFound = errors.New("not found")
 )
 
+// GetDiscount get discout sale
 func (dsi *discountImpl) GetDiscount(discountID string) (config.GeneralSale, error) {
 	sale := config.GeneralSale{}
 	var skills []byte
@@ -57,6 +58,7 @@ func (dsi *discountImpl) GetDiscount(discountID string) (config.GeneralSale, err
 	return sale, err
 }
 
+// RemoveDiscount remove discount
 func (dsi *discountImpl) RemoveDiscount(discountID string) error {
 	_, err := dsi.db.Exec(deleteDiscount, discountID)
 	return err

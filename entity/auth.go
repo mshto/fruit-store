@@ -12,14 +12,15 @@ var (
 	ErrUserAlreadyExist = errors.New("user with current name is already exist")
 )
 
-// Credentials Credentials
+// Credentials struct
 type Credentials struct {
-	ID       uuid.UUID `json:"id"`
-	Username string    `json:"username"`
-	Password string    `json:"password"`
+	ID             uuid.UUID `json:"id"`
+	Username       string    `json:"username"`
+	Password       string    `json:"password"`
+	PasswordRepeat string    `json:"passwordRepeat"`
 }
 
-// Tokens Tokens
+// Tokens struct
 type Tokens struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`

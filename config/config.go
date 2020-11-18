@@ -14,8 +14,8 @@ import (
 
 //Config struct stores system state configuration
 type Config struct {
-	ListenURL  string            `json:"ListenURL"     envconfig:"PORT"     validate:"required"`
-	URLPrefix  string            `json:"URLPrefix"     envconfig:"URLPrefix"     validate:"required"`
+	ListenURL  string            `json:"ListenURL"     envconfig:"PORT"        validate:"required"`
+	URLPrefix  string            `json:"URLPrefix"     envconfig:"URLPrefix"   validate:"required"`
 	APIVersion string            `json:"APIVersion"`
 	Logger     logger.Logger     `json:"Logger"`
 	Database   database.Database `json:"Database"`
@@ -41,7 +41,7 @@ type GeneralSale struct {
 // New is reading json file, validating and returning config
 func New(configPath string, salesCfg string) (*Config, error) {
 	config := new(Config)
-	contents, err := ioutil.ReadFile(configPath) // nolint: gosec
+	contents, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		return nil, err
 	}

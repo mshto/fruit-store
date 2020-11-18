@@ -24,12 +24,10 @@ var (
 )
 
 func TestGetAll(t *testing.T) {
-
 	type expected struct {
 		products []entity.Product
 		isErr    bool
 	}
-
 	type payload struct {
 		sqlMock func(ucMock sqlmock.Sqlmock)
 	}
@@ -101,7 +99,6 @@ func TestGetAll(t *testing.T) {
 			if test.expected.isErr {
 				assert.NotNil(t, err)
 			}
-
 		})
 	}
 }

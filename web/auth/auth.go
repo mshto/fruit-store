@@ -85,6 +85,11 @@ func (ah authHandler) Signin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if creds.Password != creds.PasswordRepeat {
+		response.RenderFailedResponse(w, http.StatusNotFound, errors.New("passwords aren't equal"))
+		return
+	}
+
 	storedUser, err := ah.repo.Auth.GetUserByName(creds.Username)
 	// if errors.Is(err, entity.ErrUserNotFound) {
 	if err == entity.ErrUserNotFound {

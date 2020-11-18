@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mshto/fruit-store/config"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 
 	"github.com/mshto/fruit-store/cache"
+	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/entity"
 )
 

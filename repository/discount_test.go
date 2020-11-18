@@ -19,14 +19,11 @@ var (
 	}
 )
 
-// VALUES ('luSjeDk3hd', 'more', '{"Oranges":1}', 30);
 func TestGetDiscount(t *testing.T) {
-
 	type expected struct {
 		sale  config.GeneralSale
 		isErr bool
 	}
-
 	type payload struct {
 		sqlMock func(ucMock sqlmock.Sqlmock)
 	}
@@ -118,17 +115,14 @@ func TestGetDiscount(t *testing.T) {
 			if test.expected.isErr {
 				assert.NotNil(t, err)
 			}
-
 		})
 	}
 }
 
 func TestRemoveDiscount(t *testing.T) {
-
 	type expected struct {
 		err error
 	}
-
 	type payload struct {
 		sqlMock func(ucMock sqlmock.Sqlmock)
 	}
@@ -179,7 +173,6 @@ func TestRemoveDiscount(t *testing.T) {
 
 			err = NewDiscount(db).RemoveDiscount(saleOne.ID)
 			assert.Equal(t, err, test.expected.err)
-
 		})
 	}
 }

@@ -25,7 +25,7 @@ const (
 	pingTimeoutSec = 5
 )
 
-// New New
+// New init database client
 func New(db Database) (*sql.DB, error) {
 	psqlInfo := fmt.Sprintf(pssqlDsnFormat, db.Host, db.Port, db.User, db.Password, db.DBName)
 	conn, err := sql.Open(db.DBType, psqlInfo)

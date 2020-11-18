@@ -14,7 +14,7 @@ func New(db *sql.DB) *Repository {
 	}
 }
 
-// Repository Repository
+// Repository container for each table entity
 type Repository struct {
 	Product  Products
 	Cart     Cart

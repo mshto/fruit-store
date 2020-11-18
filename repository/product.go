@@ -6,12 +6,12 @@ import (
 	"github.com/mshto/fruit-store/entity"
 )
 
-// Products Products
+// Products interface
 type Products interface {
 	GetAll() ([]entity.Product, error)
 }
 
-// NewProduct NewProduct
+// NewProduct generate a new product
 func NewProduct(db *sql.DB) Products {
 	return &productsImpl{
 		db: db,
@@ -26,7 +26,7 @@ var (
 	getAllProducts = `SELECT id, name, price, created_at FROM products`
 )
 
-// GetAll GetAll
+// GetAll products
 func (pri *productsImpl) GetAll() ([]entity.Product, error) {
 	products := []entity.Product{}
 
