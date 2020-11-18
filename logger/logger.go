@@ -5,6 +5,8 @@ import (
 	logrusPrefixed "github.com/x-cray/logrus-prefixed-formatter"
 )
 
+//go:generate mockgen -destination=./mocks/logger.go -package=mocks -source=./logger.go Logger
+
 //Logger struct stores system state logger configuration
 type Logger struct {
 	LogLevel string `json:"LogLevel" envconfig:"LogLevel" validate:"required"`

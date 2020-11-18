@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+
+	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/entity"
 )
 
@@ -13,6 +15,8 @@ func TestGetUserProducts(t *testing.T) {
 		isErr    bool
 	}
 	type payload struct {
+		cfg config.Config
+
 		sqlMock func(ucMock sqlmock.Sqlmock)
 	}
 

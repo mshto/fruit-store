@@ -41,6 +41,9 @@ func (pri *productsImpl) GetUserProducts(userUUID uuid.UUID) ([]entity.GetUserPr
 	products := []entity.GetUserProduct{}
 
 	rows, err := pri.db.Query(getUserProducts, userUUID)
+	if err == sql.ErrNoRows {
+		return products, nil
+	}
 	if err != nil {
 		return products, err
 	}
