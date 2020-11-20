@@ -26,8 +26,9 @@ type Config struct {
 
 // Auth struct stores auth secret keys
 type Auth struct {
-	AccessSecret  string `json:"AccessSecret"    envconfig:"AUTH_ACCESS_SECRET"     validate:"required"`
-	RefreshSecret string `json:"RefreshSecret"   envconfig:"AUTH_REFRESH_SECRET"    validate:"required"`
+	AccessSecret               string `json:"AccessSecret"    envconfig:"AUTH_ACCESS_SECRET"     validate:"required"`
+	RefreshSecret              string `json:"RefreshSecret"   envconfig:"AUTH_REFRESH_SECRET"    validate:"required"`
+	AccessSecretAtExpiresInMin int    `json:"AccessSecretAtExpiresInMin"`
 }
 
 // GeneralSale GeneralSale

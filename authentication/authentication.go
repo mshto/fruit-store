@@ -7,19 +7,22 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 
 	"github.com/mshto/fruit-store/cache"
 	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/entity"
 )
 
-// AccessDetails AccessDetails
+//go:generate mockgen -destination=mock/authentication.go -package=authmock github.com/mshto/fruit-store/authentication Auth
+
+// AccessDetails access details struct
 type AccessDetails struct {
 	AccessUUID string
 	UserUUID   string
 }
 
-// TokenDetails TokenDetails
+// TokenDetails token details struct
 type TokenDetails struct {
 	AccessToken  string
 	RefreshToken string
@@ -29,7 +32,7 @@ type TokenDetails struct {
 	RtExpires    int64
 }
 
-// Auth Auth
+// Auth interface
 type Auth interface {
 	GetUserUUID(accessUUID string) (string, error)
 	CreateTokens(userUUID uuid.UUID) (*entity.Tokens, error)
@@ -38,10 +41,11 @@ type Auth interface {
 	RemoveTokens(accessUUID, userUUID string) error
 }
 
-// New New
-func New(cfg *config.Config, cache cache.Cache) Auth {
+// New generate a new Auth
+func New(cfg *config.Config, log *logrus.Logger, cache cache.Cache) Auth {
 	return &authImpl{
 		cfg:   cfg,
+		log:   log,
 		cache: cache,
 	}
 }
@@ -49,16 +53,18 @@ func New(cfg *config.Config, cache cache.Cache) Auth {
 type authImpl struct {
 	cache cache.Cache
 	cfg   *config.Config
+	log   *logrus.Logger
 }
 
 func (aui *authImpl) GetUserUUID(accessUUID string) (string, error) {
 	return aui.cache.Get(accessUUID)
 }
 
+// CreateTokens create user tokens
 func (aui *authImpl) CreateTokens(userUUID uuid.UUID) (*entity.Tokens, error) {
 	td := &TokenDetails{}
-	// TODOL update to 15
-	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
+
+	td.AtExpires = time.Now().Add(time.Duration(aui.cfg.Auth.AccessSecretAtExpiresInMin) * time.Minute).Unix()
 	td.AccessUUID = uuid.New().String()
 
 	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
@@ -82,6 +88,7 @@ func (aui *authImpl) CreateTokens(userUUID uuid.UUID) (*entity.Tokens, error) {
 	}, err
 }
 
+// RefreshTokens refresh tokens
 func (aui *authImpl) RefreshTokens(refreshToken string) (*entity.Tokens, error) {
 	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -95,11 +102,11 @@ func (aui *authImpl) RefreshTokens(refreshToken string) (*entity.Tokens, error) 
 	if _, ok := token.Claims.(jwt.Claims); !ok {
 		return nil, err
 	}
-	claims, ok := token.Claims.(jwt.MapClaims) //the token claims should conform to MapClaims
+	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok || !token.Valid {
 		return nil, errors.New("refresh token is expired")
 	}
-	refreshUUID, ok := claims["refresh_uuid"].(string) //convert the interface to string
+	refreshUUID, ok := claims["refresh_uuid"].(string)
 	if !ok {
 		return nil, errors.New("refresh token is invalid")
 	}
@@ -119,6 +126,7 @@ func (aui *authImpl) RefreshTokens(refreshToken string) (*entity.Tokens, error) 
 	return aui.CreateTokens(userUUID)
 }
 
+// ValidateToken validate token
 func (aui *authImpl) ValidateToken(tokenString string) (*AccessDetails, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -152,6 +160,7 @@ func (aui *authImpl) ValidateToken(tokenString string) (*AccessDetails, error) {
 	}, nil
 }
 
+// RemoveTokens remove tokens
 func (aui *authImpl) RemoveTokens(accessUUID, userUUID string) error {
 	err := aui.cache.Del(accessUUID)
 	if err != nil {
@@ -164,7 +173,7 @@ func (aui *authImpl) RemoveTokens(accessUUID, userUUID string) error {
 
 func (aui *authImpl) createAccessToken(userUUID uuid.UUID, td *TokenDetails) error {
 	var err error
-	//Creating Access Token
+
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["access_uuid"] = td.AccessUUID

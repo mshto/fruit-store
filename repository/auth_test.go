@@ -23,7 +23,7 @@ func TestGetUserByName(t *testing.T) {
 		isErr bool
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {
@@ -98,7 +98,7 @@ func TestSignup(t *testing.T) {
 		err error
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {

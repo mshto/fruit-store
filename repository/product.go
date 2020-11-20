@@ -6,6 +6,8 @@ import (
 	"github.com/mshto/fruit-store/entity"
 )
 
+//go:generate mockgen -destination=mock/products.go -package=repomock github.com/mshto/fruit-store/repository Products
+
 // Products interface
 type Products interface {
 	GetAll() ([]entity.Product, error)

@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/mshto/fruit-store/cache"
 	"github.com/sirupsen/logrus"
-
-	"github.com/google/uuid"
 
 	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/entity"
 )
+
+//go:generate mockgen -destination=mock/bill.go -package=billmock github.com/mshto/fruit-store/bill Bill
 
 // Bill interface
 type Bill interface {
@@ -22,24 +23,23 @@ type Bill interface {
 	RemoveDiscount(userUUID uuid.UUID) error
 
 	ValidateCard(pmt entity.Payment) error
-	Pay(userUUID uuid.UUID) error
 }
 
-// Sale Sale
+// Sale sale info struct
 type Sale struct {
 	Name     string
 	Elements map[string]int
 	Discount int
 }
 
-// TotalInfo TotalInfo
+// TotalInfo total info struct
 type TotalInfo struct {
 	Price   string
 	Savings string
 	Amount  string
 }
 
-// New New
+// New generate a new bill
 func New(cfg *config.Config, log *logrus.Logger, cache cache.Cache) Bill {
 	return &billImpl{
 		cfg:   cfg,
@@ -54,6 +54,7 @@ type billImpl struct {
 	cache cache.Cache
 }
 
+// GetTotalInfo get total price info
 func (bli *billImpl) GetTotalInfo(userUUID uuid.UUID, products []entity.GetUserProduct) (TotalInfo, error) {
 	var sales []config.GeneralSale
 	userDiscount, err := bli.GetDiscountByUser(userUUID)
@@ -95,7 +96,7 @@ func (bli *billImpl) getTotalInfo(salePrds []Result, products map[string]Product
 	}
 }
 
-// Result GeneralSale
+// Result result struct
 type Result struct {
 	Name     string
 	Price    float32
@@ -103,7 +104,7 @@ type Result struct {
 	Discount int
 }
 
-// ProductMap ProductMap
+// ProductMap product map struct
 type ProductMap struct {
 	Price  float32
 	Amount int
@@ -136,13 +137,10 @@ func (bli *billImpl) getProductsWithSale(sales []config.GeneralSale, products ma
 				break
 			}
 			crtCount := product.Amount / productV
-			fmt.Println(productK)
-			fmt.Println(product.Amount, productV)
 			if crtCount < count || count == 0 && !isCountUpdated {
 				isCountUpdated = true
 				count = crtCount
 			}
-			fmt.Println(count)
 		}
 
 		if count == 0 || isElementsMissed {

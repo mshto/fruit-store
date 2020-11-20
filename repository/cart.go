@@ -8,6 +8,8 @@ import (
 	"github.com/mshto/fruit-store/entity"
 )
 
+//go:generate mockgen -destination=mock/cart.go -package=repomock github.com/mshto/fruit-store/repository Cart
+
 // Cart interface
 type Cart interface {
 	GetUserProducts(userUUID uuid.UUID) ([]entity.GetUserProduct, error)

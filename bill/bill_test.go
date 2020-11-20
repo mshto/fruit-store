@@ -3,21 +3,26 @@ package bill
 import (
 	"testing"
 
-	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
+	loggermock "github.com/sirupsen/logrus/hooks/test"
+	"github.com/stretchr/testify/assert"
 
+	redismock "github.com/mshto/fruit-store/cache/mock"
 	"github.com/mshto/fruit-store/config"
 	"github.com/mshto/fruit-store/entity"
 )
 
-func TestGetUserProducts(t *testing.T) {
+func TestGetTotalInfo(t *testing.T) {
 	type expected struct {
-		products []entity.GetUserProduct
-		isErr    bool
+		total TotalInfo
+		isErr bool
 	}
 	type payload struct {
-		cfg config.Config
-
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		cfg       *config.Config
+		userUUID  uuid.UUID
+		products  []entity.GetUserProduct
+		cacheMock func(cacheMock *redismock.MockCache)
 	}
 
 	tc := []struct {
@@ -25,21 +30,81 @@ func TestGetUserProducts(t *testing.T) {
 		expected
 		payload
 	}{
-		// {
-		// 	name: "Get user products with success",
-		// 	expected: expected{
-		// 		products: []entity.GetUserProduct{getUserProductOne},
-		// 		isErr:    false,
-		// 	},
-		// 	payload: payload{
-		// 		sqlMock: func(mock sqlmock.Sqlmock) {
-		// 			rows := sqlmock.NewRows([]string{"users_cart.amount", "products.id", "products.name", "products.price"}).
-		// 				AddRow(getUserProductOne.Amount, getUserProductOne.ProductUUID, getUserProductOne.Name, getUserProductOne.Price)
+		{
+			name: "Get total info user sale with success",
+			payload: payload{
+				cfg:      &config.Config{},
+				userUUID: uuid.New(),
+				products: []entity.GetUserProduct{
+					{
+						Name:   "Apples",
+						Price:  100,
+						Amount: 1,
+					},
+				},
+				cacheMock: func(cacheMock *redismock.MockCache) {
+					cacheMock.EXPECT().Get(gomock.Any()).Return(`{
+						"Elements": {
+							"Apples": 1
+						},
+						"Rule": "more",
+						"Discount": 10
+					}`, nil)
+				},
+			},
 
-		// 			mock.ExpectQuery("SELECT users_cart.amount, products.id, products.name, products.price FROM users_cart").WillReturnRows(rows)
-		// 		},
-		// 	},
-		// },
+			expected: expected{
+				total: TotalInfo{
+					Price:   "90.00",
+					Savings: "10.00",
+					Amount:  "1",
+				},
+				isErr: false,
+			},
+		},
+		{
+			name: "Get total info general sale with success",
+			payload: payload{
+				cfg: &config.Config{
+					Sales: []config.GeneralSale{
+						{
+							Elements: map[string]int{
+								"Apples": 1,
+							},
+							Rule:     "eq",
+							Discount: 10,
+						},
+						{
+							Elements: map[string]int{
+								"New": 1,
+							},
+							Rule:     "new",
+							Discount: 10,
+						},
+					},
+				},
+				userUUID: uuid.New(),
+				products: []entity.GetUserProduct{
+					{
+						Name:   "Apples",
+						Price:  100,
+						Amount: 1,
+					},
+				},
+				cacheMock: func(cacheMock *redismock.MockCache) {
+					cacheMock.EXPECT().Get(gomock.Any()).Return("", nil)
+				},
+			},
+
+			expected: expected{
+				total: TotalInfo{
+					Price:   "90.00",
+					Savings: "10.00",
+					Amount:  "1",
+				},
+				isErr: false,
+			},
+		},
 	}
 
 	for _, test := range tc {
@@ -47,23 +112,20 @@ func TestGetUserProducts(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			t.Parallel()
 
-			// New(cfg *config.Config, log *logrus.Logger, cache *cache.Cache)
+			mockCtrl := gomock.NewController(t)
+			defer mockCtrl.Finish()
 
-			// db, mock, err := sqlmock.New()
-			// if err != nil {
-			// 	t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
-			// }
-			// defer db.Close()
+			logger, _ := loggermock.NewNullLogger()
+			cache := redismock.NewMockCache(mockCtrl)
+			bill := New(test.payload.cfg, logger, cache)
 
-			// test.payload.sqlMock(mock)
+			test.payload.cacheMock(cache)
 
-			// products, err := NewCartProduct(db).GetUserProducts(userUUID)
-			// assert.Equal(t, products, test.expected.products)
-			// if test.expected.isErr {
-			// 	assert.NotNil(t, err)
-			// }
-
-			// GetTotalInfo
+			total, err := bill.GetTotalInfo(test.payload.userUUID, test.payload.products)
+			assert.Equal(t, total, test.expected.total)
+			if test.expected.isErr {
+				assert.NotNil(t, err)
+			}
 		})
 	}
 }

@@ -25,7 +25,7 @@ func TestGetDiscount(t *testing.T) {
 		isErr bool
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {
@@ -124,7 +124,7 @@ func TestRemoveDiscount(t *testing.T) {
 		err error
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {

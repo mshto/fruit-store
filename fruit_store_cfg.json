@@ -21,6 +21,7 @@
     },
     "Auth": {
         "AccessSecret": "abc",
+        "AccessSecretAtExpiresInMin": 15,
         "RefreshSecret" : "abc"
     }
 }

@@ -44,11 +44,5 @@ func (ph cartHandler) AddPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ph.bil.Pay(userUUID)
-	if err != nil {
-		response.RenderFailedResponse(w, http.StatusBadRequest, err)
-		return
-	}
-
 	response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
 }

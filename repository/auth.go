@@ -6,6 +6,8 @@ import (
 	"github.com/mshto/fruit-store/entity"
 )
 
+//go:generate mockgen -destination=mock/auth.go -package=repomock github.com/mshto/fruit-store/repository Auth
+
 // Auth interface
 type Auth interface {
 	GetUserByName(userName string) (*entity.Credentials, error)

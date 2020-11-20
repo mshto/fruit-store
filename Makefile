@@ -11,7 +11,11 @@ dependencies:
 # Test
 .PHONY: test
 test:
-	go test ./... -cover -coverprofile cover-all.out
+	go test `go list ./... | grep -v mock` -cover -coverprofile cover-all.out
+
+.PHONY: cover-html
+cover-html:
+	go tool cover -html=cover-all.out
 
 .PHONY: build
 build:

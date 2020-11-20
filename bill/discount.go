@@ -15,25 +15,20 @@ var (
 	pattertn = "%s_discount"
 )
 
+// GetDiscountByUser get discount by user
 func (bli *billImpl) GetDiscountByUser(userUUID uuid.UUID) (config.GeneralSale, error) {
 	var sale config.GeneralSale
-	fmt.Println(fmt.Sprintf(pattertn, userUUID))
-	// return bli.cache.Get(fmt.Sprintf(pattertn, userUUID))
+
 	saleStr, err := bli.cache.Get(fmt.Sprintf(pattertn, userUUID))
 	if err != nil {
 		return sale, err
 	}
 
-	// []byte(serialized)
 	err = json.Unmarshal([]byte(saleStr), &sale)
-	// if err == nil {
-	fmt.Println(sale, err)
 	return sale, err
-	// }
 }
 
 func (bli *billImpl) SetDiscount(userUUID uuid.UUID, sale config.GeneralSale) error {
-
 	serialized, err := json.Marshal(sale)
 	if err != nil {
 		return err
@@ -42,6 +37,7 @@ func (bli *billImpl) SetDiscount(userUUID uuid.UUID, sale config.GeneralSale) er
 	return bli.cache.Set(fmt.Sprintf(pattertn, userUUID), serialized, time.Duration(bli.cfg.Redis.DiscountTTL)*time.Second)
 }
 
+// RemoveDiscount remove discount
 func (bli *billImpl) RemoveDiscount(userUUID uuid.UUID) error {
 	_, err := bli.GetDiscountByUser(userUUID)
 	switch {

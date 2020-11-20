@@ -8,6 +8,8 @@ import (
 	"github.com/mshto/fruit-store/config"
 )
 
+//go:generate mockgen -destination=mock/discount.go -package=repomock github.com/mshto/fruit-store/repository Discount
+
 // Discount interface
 type Discount interface {
 	GetDiscount(discountID string) (config.GeneralSale, error)

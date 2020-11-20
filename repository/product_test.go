@@ -29,7 +29,7 @@ func TestGetAll(t *testing.T) {
 		isErr    bool
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {

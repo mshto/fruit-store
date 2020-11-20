@@ -30,7 +30,7 @@ func TestGetUserProducts(t *testing.T) {
 		isErr    bool
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {
@@ -109,7 +109,7 @@ func TestCreateUserProducts(t *testing.T) {
 		err error
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {
@@ -169,7 +169,7 @@ func TestCreateUserProduct(t *testing.T) {
 		err error
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {
@@ -229,7 +229,7 @@ func TestRemoveUserProducts(t *testing.T) {
 		err error
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {
@@ -287,7 +287,7 @@ func TestRemoveUserProduct(t *testing.T) {
 		err error
 	}
 	type payload struct {
-		sqlMock func(ucMock sqlmock.Sqlmock)
+		sqlMock func(sqlMock sqlmock.Sqlmock)
 	}
 
 	tc := []struct {

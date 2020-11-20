@@ -8,7 +8,7 @@ import (
 	"github.com/go-redis/redis"
 )
 
-//go:generate mockgen -destination=mocks/redis.go -package=redismock github.com/mshto/fruit-store/cache Cache
+//go:generate mockgen -destination=mock/redis.go -package=redismock github.com/mshto/fruit-store/cache Cache
 
 // error
 var (
