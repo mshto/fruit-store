@@ -18,7 +18,7 @@ import (
 )
 
 // New creates a router for URL-to-service mapping
-func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, redis *cache.Cache) *mux.Router {
+func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, redis cache.Cache) *mux.Router {
 	jwt := authentication.New(cfg, redis)
 	bil := bill.New(cfg, log, redis)
 

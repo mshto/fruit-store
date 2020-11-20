@@ -40,7 +40,7 @@ type TotalInfo struct {
 }
 
 // New New
-func New(cfg *config.Config, log *logrus.Logger, cache *cache.Cache) Bill {
+func New(cfg *config.Config, log *logrus.Logger, cache cache.Cache) Bill {
 	return &billImpl{
 		cfg:   cfg,
 		log:   log,
@@ -51,7 +51,7 @@ func New(cfg *config.Config, log *logrus.Logger, cache *cache.Cache) Bill {
 type billImpl struct {
 	cfg   *config.Config
 	log   *logrus.Logger
-	cache *cache.Cache
+	cache cache.Cache
 }
 
 func (bli *billImpl) GetTotalInfo(userUUID uuid.UUID, products []entity.GetUserProduct) (TotalInfo, error) {
