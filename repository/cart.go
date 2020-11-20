@@ -29,7 +29,7 @@ type cartImpl struct {
 }
 
 var (
-	getUserProducts    = `SELECT users_cart.amount, products.id, products.name, products.price FROM users_cart LEFT JOIN products ON users_cart.product_id=products.id AND users_cart.user_id=$1;`
+	getUserProducts    = `SELECT users_cart.amount, products.id, products.name, products.price FROM users_cart INNER JOIN products ON users_cart.user_id=$1 AND users_cart.product_id=products.id;`
 	createUserProducts = `INSERT INTO users_cart (user_id, product_id, amount) VALUES ($1, $2, $3) ON CONFLICT (product_id, user_id) DO UPDATE SET amount=$3 RETURNING user_id`
 	createUserProduct  = `INSERT INTO users_cart (user_id, product_id, amount) VALUES ($1, $2, $3) ON CONFLICT (product_id, user_id) DO UPDATE SET amount=users_cart.amount+1 RETURNING user_id`
 	deleteUserProducts = `DELETE FROM users_cart WHERE user_id = $1`
