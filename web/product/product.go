@@ -10,34 +10,30 @@ import (
 	"github.com/mshto/fruit-store/web/common/response"
 )
 
-// Service Partner Attribute Service
+// Service product interface
 type Service interface {
 	GetAll(w http.ResponseWriter, r *http.Request)
-	// Create(w http.ResponseWriter, r *http.Request)
-	// GetOne(w http.ResponseWriter, r *http.Request)
-	// Update(w http.ResponseWriter, r *http.Request)
-	// Delete(w http.ResponseWriter, r *http.Request)
 }
 
-// ProductHandler ProductHandler
+// ProductHandler product handler
 type productHandler struct {
-	cfg  *config.Config
-	log  *logrus.Logger
-	repo *repository.Repository
+	cfg         *config.Config
+	log         *logrus.Logger
+	productRepo repository.Products
 }
 
-// NewProductHandler NewProductHandler
-func NewProductHandler(cfg *config.Config, log *logrus.Logger, repo *repository.Repository) Service {
+// NewProductHandler init a new product handler
+func NewProductHandler(cfg *config.Config, log *logrus.Logger, productRepo repository.Products) Service {
 	return productHandler{
-		cfg:  cfg,
-		log:  log,
-		repo: repo,
+		cfg:         cfg,
+		log:         log,
+		productRepo: productRepo,
 	}
 }
 
-// GetAllProducts retrieves all products from db
+// GetAllProducts retrieves all products
 func (ph productHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	products, err := ph.repo.Product.GetAll()
+	products, err := ph.productRepo.GetAll()
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return

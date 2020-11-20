@@ -22,7 +22,7 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 	jwt := authentication.New(cfg, log, redis)
 	bil := bill.New(cfg, log, redis)
 
-	pdh := product.NewProductHandler(cfg, log, repo)
+	pdh := product.NewProductHandler(cfg, log, repo.Product)
 	cth := cart.NewCardHandler(cfg, log, repo, bil)
 	auh := auth.NewAuthHandler(cfg, log, repo, jwt)
 
