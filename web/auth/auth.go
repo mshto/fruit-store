@@ -16,37 +16,32 @@ import (
 	"github.com/mshto/fruit-store/web/middleware"
 )
 
-// Service Service
+// Service auth interface
 type Service interface {
 	Signup(w http.ResponseWriter, r *http.Request)
 	Signin(w http.ResponseWriter, r *http.Request)
 	Refresh(w http.ResponseWriter, r *http.Request)
 	Logout(w http.ResponseWriter, r *http.Request)
-	// Create(w http.ResponseWriter, r *http.Request)
-	// GetOne(w http.ResponseWriter, r *http.Request)
-	// Update(w http.ResponseWriter, r *http.Request)
-	// Delete(w http.ResponseWriter, r *http.Request)
 }
 
-// ProductHandler ProductHandler
 type authHandler struct {
-	cfg  *config.Config
-	log  *logrus.Logger
-	repo *repository.Repository
-	auth authentication.Auth
+	cfg      *config.Config
+	log      *logrus.Logger
+	authRepo repository.Auth
+	auth     authentication.Auth
 }
 
-// NewAuthHandler NewAuthHandler
-func NewAuthHandler(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, auth authentication.Auth) Service {
+// NewAuthHandler init new auth handler
+func NewAuthHandler(cfg *config.Config, log *logrus.Logger, authRepo repository.Auth, auth authentication.Auth) Service {
 	return authHandler{
-		cfg:  cfg,
-		log:  log,
-		repo: repo,
-		auth: auth,
+		cfg:      cfg,
+		log:      log,
+		authRepo: authRepo,
+		auth:     auth,
 	}
 }
 
-// Signup Signup
+// Signup signup user
 func (ah authHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	creds := &entity.Credentials{}
 	err := json.NewDecoder(r.Body).Decode(creds)
@@ -67,8 +62,7 @@ func (ah authHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	creds.Password = string(hashedPassword)
-	err = ah.repo.Auth.Signup(creds)
-	// if errors.Is(err, entity.ErrUserAlreadyExist) {
+	err = ah.authRepo.Signup(creds)
 	if err == entity.ErrUserAlreadyExist {
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
@@ -81,7 +75,7 @@ func (ah authHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
 }
 
-// Signin Signin
+// Signin signin user
 func (ah authHandler) Signin(w http.ResponseWriter, r *http.Request) {
 	creds := &entity.Credentials{}
 	err := json.NewDecoder(r.Body).Decode(creds)
@@ -90,19 +84,17 @@ func (ah authHandler) Signin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	storedUser, err := ah.repo.Auth.GetUserByName(creds.Username)
-	// if errors.Is(err, entity.ErrUserNotFound) {
+	storedUser, err := ah.authRepo.GetUserByName(creds.Username)
 	if err == entity.ErrUserNotFound {
 		response.RenderFailedResponse(w, http.StatusNotFound, err)
 		return
 	}
-	ah.log.Error(storedUser)
 	if err != nil {
 		response.RenderResponse(w, http.StatusInternalServerError, err)
 		return
 	}
+
 	if err = bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(creds.Password)); err != nil {
-		// If the two passwords don't match, return a 401 status
 		response.RenderResponse(w, http.StatusUnauthorized, response.EmptyResp{})
 		return
 	}
@@ -116,7 +108,7 @@ func (ah authHandler) Signin(w http.ResponseWriter, r *http.Request) {
 	response.RenderResponse(w, http.StatusOK, tokens)
 }
 
-// Logout Logout
+// Refresh refresh user token
 func (ah authHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	tokens := &entity.Tokens{}
 	err := json.NewDecoder(r.Body).Decode(tokens)
@@ -126,14 +118,13 @@ func (ah authHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	}
 	generatedTokens, err := ah.auth.RefreshTokens(tokens.RefreshToken)
 	if err != nil {
-		// If the two passwords don't match, return a 401 status
 		response.RenderFailedResponse(w, http.StatusUnauthorized, err)
 		return
 	}
 	response.RenderResponse(w, http.StatusOK, generatedTokens)
 }
 
-// Logout Logout
+// Logout logout user
 func (ah authHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	accessUUID, ok := ctx.Value(middleware.AccessUUID).(string)

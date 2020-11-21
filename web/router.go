@@ -24,7 +24,7 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 
 	pdh := product.NewProductHandler(cfg, log, repo.Product)
 	cth := cart.NewCardHandler(cfg, log, repo, bil)
-	auh := auth.NewAuthHandler(cfg, log, repo, jwt)
+	auh := auth.NewAuthHandler(cfg, log, repo.Auth, jwt)
 
 	router := mux.NewRouter().StrictSlash(true)
 	api := router.PathPrefix(cfg.URLPrefix).Subrouter()

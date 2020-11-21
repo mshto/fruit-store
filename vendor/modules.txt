@@ -24,7 +24,7 @@ github.com/go-redis/redis/internal/hashtag
 github.com/go-redis/redis/internal/pool
 github.com/go-redis/redis/internal/proto
 github.com/go-redis/redis/internal/util
-# github.com/golang/mock v1.1.1
+# github.com/golang/mock v1.4.4
 github.com/golang/mock/gomock
 # github.com/gomodule/redigo v2.0.0+incompatible
 github.com/gomodule/redigo/internal
@@ -51,6 +51,7 @@ github.com/mgutz/ansi
 github.com/pmezard/go-difflib/difflib
 # github.com/sirupsen/logrus v1.7.0
 github.com/sirupsen/logrus
+github.com/sirupsen/logrus/hooks/test
 # github.com/stretchr/testify v1.6.1
 github.com/stretchr/testify/assert
 # github.com/urfave/negroni v1.0.0
@@ -66,8 +67,6 @@ github.com/yuin/gopher-lua/pm
 golang.org/x/crypto/bcrypt
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20200625001655-4c5254603344
-golang.org/x/net/context
 # golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae
 golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/unix
