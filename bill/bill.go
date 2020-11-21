@@ -39,6 +39,20 @@ type TotalInfo struct {
 	Amount  string
 }
 
+// Result result struct
+type Result struct {
+	Name     string
+	Price    float32
+	Amount   int
+	Discount int
+}
+
+// ProductMap product map struct
+type ProductMap struct {
+	Price  float32
+	Amount int
+}
+
 // New generate a new bill
 func New(cfg *config.Config, log *logrus.Logger, cache cache.Cache) Bill {
 	return &billImpl{
@@ -94,20 +108,6 @@ func (bli *billImpl) getTotalInfo(salePrds []Result, products map[string]Product
 		Savings: fmt.Sprintf("%.2f", price-totalPrice),
 		Amount:  strconv.Itoa(amount),
 	}
-}
-
-// Result result struct
-type Result struct {
-	Name     string
-	Price    float32
-	Amount   int
-	Discount int
-}
-
-// ProductMap product map struct
-type ProductMap struct {
-	Price  float32
-	Amount int
 }
 
 func (bli *billImpl) getPriceWithoutSale(products []entity.GetUserProduct) (map[string]ProductMap, float32) {

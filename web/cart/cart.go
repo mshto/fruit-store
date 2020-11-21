@@ -55,12 +55,14 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
 	if err != nil {
+		ph.log.Errorf("failed to get user uuid, user: %v, error: %v", ctx.Value(middleware.UserUUID).(string), err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	products, err := ph.cartRepo.GetUserProducts(userUUID)
 	if err != nil {
+		ph.log.Errorf("failed to get user products, user: %v, error: %v", userUUID, err)
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -71,6 +73,7 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	total, err := ph.bil.GetTotalInfo(userUUID, products)
 	if err != nil {
+		ph.log.Errorf("failed to get total info, user: %v, error: %v", userUUID, err)
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -78,6 +81,7 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	var isDiscountAdded bool
 	sale, err := ph.bil.GetDiscountByUser(userUUID)
 	if err != nil && err != cache.ErrNotFound {
+		ph.log.Errorf("failed to get discount by user, user: %v, error: %v", userUUID, err)
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -99,6 +103,7 @@ func (ph cartHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
 	if err != nil {
+		ph.log.Errorf("failed to get user uuid, user: %v, error: %v", ctx.Value(middleware.UserUUID).(string), err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
@@ -106,12 +111,14 @@ func (ph cartHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	prd := &entity.UserProduct{}
 	err = json.NewDecoder(r.Body).Decode(prd)
 	if err != nil {
+		ph.log.Errorf("failed to decode user product, user: %v, error: %v", userUUID, err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	err = ph.cartRepo.CreateUserProducts(userUUID, *prd)
 	if err != nil {
+		ph.log.Errorf("failed to create user product, user: %v, error: %v", userUUID, err)
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -124,18 +131,21 @@ func (ph cartHandler) AddOneProduct(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
 	if err != nil {
+		ph.log.Errorf("failed to get user uuid, user: %v, error: %v", ctx.Value(middleware.UserUUID).(string), err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	productUUID, err := uuid.Parse(mux.Vars(r)["productID"])
 	if err != nil {
+		ph.log.Errorf("failed to get product uuid, user: %v, error: %v", userUUID, err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	err = ph.cartRepo.CreateUserProduct(userUUID, productUUID)
 	if err != nil {
+		ph.log.Errorf("failed to create user product, user: %v, error: %v", userUUID, err)
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -148,18 +158,21 @@ func (ph cartHandler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
 	if err != nil {
+		ph.log.Errorf("failed to get user uuid, user: %v, error: %v", ctx.Value(middleware.UserUUID).(string), err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	productUUID, err := uuid.Parse(mux.Vars(r)["productID"])
 	if err != nil {
+		ph.log.Errorf("failed to get product uuid, user: %v, error: %v", userUUID, err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	err = ph.cartRepo.RemoveUserProduct(userUUID, productUUID)
 	if err != nil {
+		ph.log.Errorf("failed to get remove user product, user: %v, error: %v", userUUID, err)
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}

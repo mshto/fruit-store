@@ -35,7 +35,7 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 	routerV1.HandleFunc("/refresh", auh.Refresh).Methods(http.MethodPost)
 
 	routerV1Auth := api.PathPrefix("/v1").Subrouter()
-	routerV1Auth.Use(middleware.AuthMiddleware(jwt))
+	routerV1Auth.Use(middleware.AuthMiddleware(jwt, log))
 
 	routerV1Auth.HandleFunc("/logout", auh.Logout).Methods(http.MethodPost)
 	routerV1Auth.HandleFunc("/products", pdh.GetAll).Methods(http.MethodGet)

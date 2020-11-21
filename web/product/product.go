@@ -35,6 +35,7 @@ func NewProductHandler(cfg *config.Config, log *logrus.Logger, productRepo repos
 func (ph productHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	products, err := ph.productRepo.GetAll()
 	if err != nil {
+		ph.log.Errorf("failed to get all product, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}

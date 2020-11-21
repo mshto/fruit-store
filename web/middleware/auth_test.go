@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	loggermock "github.com/sirupsen/logrus/hooks/test"
 
 	"github.com/mshto/fruit-store/authentication"
 	authmock "github.com/mshto/fruit-store/authentication/mock"
@@ -70,8 +71,9 @@ func TestAuthMiddleware(t *testing.T) {
 			defer mockCtrl.Finish()
 
 			auth := authmock.NewMockAuth(mockCtrl)
-
 			test.payload.authMock(auth)
+
+			logger, _ := loggermock.NewNullLogger()
 
 			req, _ := http.NewRequest(http.MethodGet, "url", nil)
 			req.Header.Set("Authorization", test.payload.authorizationHeader)
@@ -79,7 +81,7 @@ func TestAuthMiddleware(t *testing.T) {
 			rw := httptest.NewRecorder()
 
 			next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
-			AuthMiddleware(auth)(next).ServeHTTP(rw, req)
+			AuthMiddleware(auth, logger)(next).ServeHTTP(rw, req)
 		})
 	}
 }

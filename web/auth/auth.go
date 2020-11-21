@@ -46,17 +46,20 @@ func (ah authHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	creds := &entity.Credentials{}
 	err := json.NewDecoder(r.Body).Decode(creds)
 	if err != nil {
+		ah.log.Errorf("failed to decode credentials, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	if creds.Password != creds.PasswordRepeat {
+		ah.log.Errorf("passwords aren't equal, user name: %s", creds.Username)
 		response.RenderFailedResponse(w, http.StatusNotFound, errors.New("passwords aren't equal"))
 		return
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(creds.Password), 8)
 	if err != nil {
+		ah.log.Errorf("failed to generate from password, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
@@ -64,10 +67,12 @@ func (ah authHandler) Signup(w http.ResponseWriter, r *http.Request) {
 	creds.Password = string(hashedPassword)
 	err = ah.authRepo.Signup(creds)
 	if err == entity.ErrUserAlreadyExist {
+		ah.log.Errorf("failed to sign up, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 	if err != nil {
+		ah.log.Errorf("failed to sign up, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}
@@ -80,27 +85,32 @@ func (ah authHandler) Signin(w http.ResponseWriter, r *http.Request) {
 	creds := &entity.Credentials{}
 	err := json.NewDecoder(r.Body).Decode(creds)
 	if err != nil {
+		ah.log.Errorf("failed to decode credentials, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 
 	storedUser, err := ah.authRepo.GetUserByName(creds.Username)
 	if err == entity.ErrUserNotFound {
+		ah.log.Errorf("failed to get user by name, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusNotFound, err)
 		return
 	}
 	if err != nil {
+		ah.log.Errorf("failed to get user by name, error: %v", err)
 		response.RenderResponse(w, http.StatusInternalServerError, err)
 		return
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(storedUser.Password), []byte(creds.Password)); err != nil {
+		ah.log.Errorf("failed to compare hash and password, error: %v", err)
 		response.RenderResponse(w, http.StatusUnauthorized, response.EmptyResp{})
 		return
 	}
 
 	tokens, err := ah.auth.CreateTokens(storedUser.ID)
 	if err != nil {
+		ah.log.Errorf("failed to create tokens, error: %v", err)
 		response.RenderResponse(w, http.StatusForbidden, err)
 		return
 	}
@@ -113,11 +123,13 @@ func (ah authHandler) Refresh(w http.ResponseWriter, r *http.Request) {
 	tokens := &entity.Tokens{}
 	err := json.NewDecoder(r.Body).Decode(tokens)
 	if err != nil {
+		ah.log.Errorf("failed to decode tokens, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}
 	generatedTokens, err := ah.auth.RefreshTokens(tokens.RefreshToken)
 	if err != nil {
+		ah.log.Errorf("failed to refresh tokens, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusUnauthorized, err)
 		return
 	}
@@ -129,16 +141,19 @@ func (ah authHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	accessUUID, ok := ctx.Value(middleware.AccessUUID).(string)
 	if !ok {
+		ah.log.Errorf("failed to get accessUUID")
 		response.RenderFailedResponse(w, http.StatusBadRequest, errors.New("accessUUID not found"))
 		return
 	}
 	userUUID, ok := ctx.Value(middleware.UserUUID).(string)
 	if !ok {
+		ah.log.Errorf("failed to get UserUUID")
 		response.RenderFailedResponse(w, http.StatusBadRequest, errors.New("userUUID not found"))
 		return
 	}
 	err := ah.auth.RemoveTokens(accessUUID, userUUID)
 	if err != nil {
+		ah.log.Errorf("failed to remove tokens, error: %v", err)
 		response.RenderFailedResponse(w, http.StatusBadRequest, err)
 		return
 	}

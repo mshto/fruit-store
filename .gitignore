@@ -1,2 +1,5 @@
-fruit_store.log
+# bin
 fruit-store
+
+# coverage results
+cover-all.out
