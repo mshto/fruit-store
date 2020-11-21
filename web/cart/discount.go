@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+
 	"github.com/mshto/fruit-store/cache"
 	"github.com/mshto/fruit-store/entity"
 	"github.com/mshto/fruit-store/repository"
@@ -13,7 +14,7 @@ import (
 	"github.com/mshto/fruit-store/web/middleware"
 )
 
-// GetAllProducts retrieves all products from db
+// AddDiscout add user discout
 func (ph cartHandler) AddDiscout(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
@@ -39,7 +40,7 @@ func (ph cartHandler) AddDiscout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dscRepo, err := ph.repo.Discount.GetDiscount(dsc.ID)
+	dscRepo, err := ph.discRepo.GetDiscount(dsc.ID)
 	if err == repository.ErrNotFound {
 		response.RenderFailedResponse(w, http.StatusNotFound, err)
 		return

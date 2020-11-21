@@ -21,7 +21,7 @@ type Cart interface {
 
 // NewCartProduct generate a new cart product
 func NewCartProduct(db *sql.DB) Cart {
-	return &productsImpl{
+	return &cartImpl{
 		db: db,
 	}
 }
@@ -39,7 +39,7 @@ var (
 )
 
 // GetUserProducts get user products
-func (pri *productsImpl) GetUserProducts(userUUID uuid.UUID) ([]entity.GetUserProduct, error) {
+func (pri *cartImpl) GetUserProducts(userUUID uuid.UUID) ([]entity.GetUserProduct, error) {
 	products := []entity.GetUserProduct{}
 
 	rows, err := pri.db.Query(getUserProducts, userUUID)
@@ -64,23 +64,23 @@ func (pri *productsImpl) GetUserProducts(userUUID uuid.UUID) ([]entity.GetUserPr
 }
 
 // CreateUserProducts create user products
-func (pri *productsImpl) CreateUserProducts(userUUID uuid.UUID, prd entity.UserProduct) error {
+func (pri *cartImpl) CreateUserProducts(userUUID uuid.UUID, prd entity.UserProduct) error {
 	return pri.db.QueryRow(createUserProducts, userUUID, prd.ProductUUID, prd.Amount).Scan(&prd.UserID)
 }
 
 // CreateUserProduct create user products
-func (pri *productsImpl) CreateUserProduct(userUUID, productUUID uuid.UUID) error {
+func (pri *cartImpl) CreateUserProduct(userUUID, productUUID uuid.UUID) error {
 	return pri.db.QueryRow(createUserProduct, userUUID, productUUID, 1).Scan(&userUUID)
 }
 
 // RemoveUserProducts remove user products
-func (pri *productsImpl) RemoveUserProducts(userUUID uuid.UUID) error {
+func (pri *cartImpl) RemoveUserProducts(userUUID uuid.UUID) error {
 	_, err := pri.db.Exec(deleteUserProducts, userUUID)
 	return err
 }
 
 // RemoveUserProduct remove user product
-func (pri *productsImpl) RemoveUserProduct(userUUID, productUUID uuid.UUID) error {
+func (pri *cartImpl) RemoveUserProduct(userUUID, productUUID uuid.UUID) error {
 	_, err := pri.db.Exec(deleteUserProduct, userUUID, productUUID)
 	return err
 }

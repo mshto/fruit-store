@@ -89,8 +89,6 @@ func TestGetDiscount(t *testing.T) {
 						AddRow(true)
 					mock.ExpectQuery("SELECT exists").WithArgs(saleOne.ID).WillReturnRows(rows)
 
-					rows = sqlmock.NewRows([]string{"id", "rule", "elements", "discount"}).
-						AddRow(saleOne.ID, saleOne.Rule, []byte(`{"Oranges":1}`), saleOne.Discount)
 					mock.ExpectQuery("SELECT id, rule, elements, discount FROM discount").WillReturnError(ErrNotFound)
 				},
 			},

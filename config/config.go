@@ -60,7 +60,10 @@ func New(configPath string, salesCfg string) (*Config, error) {
 		return nil, err
 	}
 
-	readConfigFromENV(config)
+	err = readConfigFromENV(config)
+	if err != nil {
+		return nil, err
+	}
 
 	err = validate(config)
 	return config, err

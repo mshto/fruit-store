@@ -23,7 +23,7 @@ func New(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, re
 	bil := bill.New(cfg, log, redis)
 
 	pdh := product.NewProductHandler(cfg, log, repo.Product)
-	cth := cart.NewCardHandler(cfg, log, repo, bil)
+	cth := cart.NewCardHandler(cfg, log, repo.Cart, repo.Discount, bil)
 	auh := auth.NewAuthHandler(cfg, log, repo.Auth, jwt)
 
 	router := mux.NewRouter().StrictSlash(true)

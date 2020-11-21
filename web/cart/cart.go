@@ -32,23 +32,25 @@ type Service interface {
 
 // ProductHandler product handler struct
 type cartHandler struct {
-	cfg  *config.Config
-	log  *logrus.Logger
-	repo *repository.Repository
-	bil  bill.Bill
+	cfg      *config.Config
+	log      *logrus.Logger
+	cartRepo repository.Cart
+	discRepo repository.Discount
+	bil      bill.Bill
 }
 
 // NewCardHandler NewCardHandler
-func NewCardHandler(cfg *config.Config, log *logrus.Logger, repo *repository.Repository, bil bill.Bill) Service {
+func NewCardHandler(cfg *config.Config, log *logrus.Logger, cartRepo repository.Cart, discRepo repository.Discount, bil bill.Bill) Service {
 	return cartHandler{
-		cfg:  cfg,
-		log:  log,
-		repo: repo,
-		bil:  bil,
+		cfg:      cfg,
+		log:      log,
+		cartRepo: cartRepo,
+		discRepo: discRepo,
+		bil:      bil,
 	}
 }
 
-// GetAllProducts retrieves all products from db
+// GetAll retrieves all user products
 func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
@@ -57,7 +59,7 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	products, err := ph.repo.Cart.GetUserProducts(userUUID)
+	products, err := ph.cartRepo.GetUserProducts(userUUID)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
@@ -92,7 +94,7 @@ func (ph cartHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// GetAllProducts retrieves all products from db
+// UpdateProduct update user products
 func (ph cartHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
@@ -108,7 +110,7 @@ func (ph cartHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ph.repo.Cart.CreateUserProducts(userUUID, *prd)
+	err = ph.cartRepo.CreateUserProducts(userUUID, *prd)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
@@ -117,7 +119,7 @@ func (ph cartHandler) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
 }
 
-// GetAllProducts retrieves all products from db
+// AddOneProduct add user product
 func (ph cartHandler) AddOneProduct(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
@@ -132,7 +134,7 @@ func (ph cartHandler) AddOneProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ph.repo.Cart.CreateUserProduct(userUUID, productUUID)
+	err = ph.cartRepo.CreateUserProduct(userUUID, productUUID)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
@@ -141,7 +143,7 @@ func (ph cartHandler) AddOneProduct(w http.ResponseWriter, r *http.Request) {
 	response.RenderResponse(w, http.StatusCreated, response.EmptyResp{})
 }
 
-// GetAllProducts retrieves all products from db
+// RemoveProduct remove user product
 func (ph cartHandler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	userUUID, err := uuid.Parse(ctx.Value(middleware.UserUUID).(string))
@@ -156,7 +158,7 @@ func (ph cartHandler) RemoveProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ph.repo.Cart.RemoveUserProduct(userUUID, productUUID)
+	err = ph.cartRepo.RemoveUserProduct(userUUID, productUUID)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return

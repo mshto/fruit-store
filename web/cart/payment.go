@@ -32,13 +32,13 @@ func (ph cartHandler) AddPayment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = ph.repo.Cart.RemoveUserProducts(userUUID)
+	err = ph.cartRepo.RemoveUserProducts(userUUID)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return
 	}
 
-	ph.bil.RemoveDiscount(userUUID)
+	err = ph.bil.RemoveDiscount(userUUID)
 	if err != nil {
 		response.RenderFailedResponse(w, http.StatusInternalServerError, err)
 		return

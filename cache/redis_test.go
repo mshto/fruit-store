@@ -51,6 +51,9 @@ func TestRedisDelNegative(t *testing.T) {
 	cache, err := New(Redis{
 		Address: s.Addr(),
 	})
+	if err != nil {
+		t.Error("failed to init cache")
+	}
 
 	err = cache.Del(key)
 	assert.NotNil(t, err)

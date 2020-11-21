@@ -241,6 +241,9 @@ func TestValidateToken(t *testing.T) {
 			test.payload.cacheMock(cache)
 
 			token, err := bill.CreateTokens(test.payload.userUUID)
+			if err != nil {
+				t.Errorf("failed to CreateTokens, error: %v", err)
+			}
 
 			newTokens, err := bill.ValidateToken(token.AccessToken)
 			assert.NotNil(t, newTokens)
