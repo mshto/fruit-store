@@ -3,3 +3,6 @@ fruit-store
 
 # coverage results
 cover-all.out
+
+# vscode
+.vscode

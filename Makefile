@@ -32,5 +32,6 @@ migrate-up:
 
 migrate-down:
 	@migrate -path $(MIGRATIONS_DIR) -database $(MIGRATION_PATH) down
+
 migrate-force:
 	@migrate -path $(MIGRATIONS_DIR) -database $(MIGRATION_PATH) force n 

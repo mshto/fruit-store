@@ -18,6 +18,11 @@
 `make lint`
 
 ###### Database operations:
-Create a new migrations `migrate-new`
-Run all migrations up: `make migrate-up`
-Run all migrations down (rollback): `migrate-down`
+###### Create a new migrations:
+`migrate-new`
+
+###### Run all migrations up:
+`make migrate-up`
+
+###### Run all migrations down (rollback):
+`migrate-down`
