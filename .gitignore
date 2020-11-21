@@ -6,3 +6,6 @@ cover-all.out
 
 # vscode
 .vscode
+
+# vendor
+vendor
